@@ -17,7 +17,7 @@
 **Windows:**
 
 -   Disk usage estimates are approximate and may vary based on system configuration.
--   The `minimal` profile is recommended if you don't require local documentation, as the large number of files can cause issues with some antivirus systems .[Rust Programming Language+1The Rust Programming Language Forum+1](https://rust-lang.github.io/rustup/concepts/profiles.html?utm_source=chatgpt.com)
+-   The `minimal` profile is recommended if you don't require local documentation, as the large number of files can cause issues with some antivirus systems.
 
 
 ### Recommendations
