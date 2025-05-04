@@ -50,5 +50,7 @@ profile = "minimal"
 components = ["clippy", "rustfmt"]
 ```
 
-This custom Rust training was created by IQSOFT - EduTech/gabor for Ericsson – © 2025. 
-All materials are exclusively for use by participants of the training. Sharing or using these materials outside of the training is not permitted without written permission from IQSOFT - EduTech.
+---
+
+*This custom Rust training was created by **IQSOFT - EduTech/gabor for Ericsson – © 2025**. 
+All materials are exclusively for use by participants of the training. Using these materials outside of the training is not permitted without written permission from IQSOFT - EduTech.*

@@ -210,4 +210,7 @@ fn main() {
 5.  External library dependencies, also known as crates, are declared and managed in the **`Cargo.toml`** file, specifically within the `[dependencies]` section.
 
 
-This custom Rust training was created by IQSOFT - EduTech/gabor for Ericsson - Copyright 2025. All materials can be only used exclusively by the participants of the training. The materials are not allowed to be shared or used outside of the training without the written permission of IQSOFT - EduTech/gabor. 
+---
+
+*This custom Rust training was created by **IQSOFT - EduTech/gabor for Ericsson – © 2025**. 
+All materials are exclusively for use by participants of the training. Using these materials outside of the training is not permitted without written permission from IQSOFT - EduTech.*
