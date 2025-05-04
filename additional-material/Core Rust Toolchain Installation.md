@@ -1,5 +1,5 @@
 
-**Core Rust Toolchain Installation**
+# Core Rust Toolchain Installation
 
 *   **Why `rustup`?** Rust doesn't just provide a compiler (`rustc`) and a build system/package manager (`cargo`). It provides `rustup`, a toolchain multiplexer. `rustup` manages multiple Rust installations (stable, beta, nightly), different target platforms (for cross-compilation), and associated tools like `rustfmt` (formatter) and `clippy` (linter). Using `rustup` is the standard and recommended way to manage your Rust environment. It simplifies updates and component management significantly.
 
