@@ -1,6 +1,6 @@
 # Lab 02: "Hello, World!" Program with VS Code Debugging
 
-## 2. Introduction & Goal
+## Introduction & Goal
 
 Welcome to Rust! The traditional first step in learning any new language is printing "Hello, world!". This lab guides you through creating that simple program, but more importantly, it shows you how to set up Visual Studio Code (VS Code) for a smooth Rust development experience, including using its powerful integrated debugger. Debugging is a crucial skill for understanding how your code executes and for finding issues efficiently.
 
@@ -15,13 +15,13 @@ Welcome to Rust! The traditional first step in learning any new language is prin
 *   Launch the VS Code debugger for your Rust program.
 *   Step through your code line-by-line using the debugger controls.
 
-## 3. Scenario
+## Scenario
 
 Imagine you are starting a brand new Rust project. Before diving into complex logic or integrating multiple libraries, you need to ensure your fundamental development tools are configured and working correctly. Can you reliably compile your code? Can you execute it? Crucially, can you examine the program's state and execution flow step-by-step? Running a simple "Hello, World!" and stepping through it with a debugger is an excellent way to confirm your integrated development environment setup is solid and ready for more involved tasks.
 
 *Why use VS Code and Rust together?* VS Code is a widely-used, free, and powerful cross-platform code editor. When paired with the `rust-analyzer` extension, it offers sophisticated language support tailored for Rust, such as precise code completion, real-time error and warning highlighting, robust code navigation (like jumping to definitions), and useful refactoring suggestions. Integrating a debugger extension (like `CodeLLDB`) allows you to directly inspect your program's state (variables, call stack) as it runs, a capability far more powerful for diagnosing issues than relying solely on print statements.
 
-## 4. Prerequisites
+## Prerequisites
 
 *   **Software:**
     *   **Rust Toolchain:** Installed (includes `rustc` compiler and `cargo` build tool/package manager). This lab is based on Rust `edition = "2024"`. We assume the following tool versions: `rustc 1.86.0 (05f9846f8 2025-03-31)` and `cargo 1.86.0 (adf9b6ad1 2025-02-28)`. While newer versions should be compatible, these were used for testing. Ensure you have at least Rust 1.56.0 or later, which is required for the 2021 edition features (and thus 2024).
@@ -39,7 +39,7 @@ Imagine you are starting a brand new Rust project. Before diving into complex lo
     ```
     You should see output indicating version numbers for both. Confirm that VS Code is also installed and launches correctly. If your `rustc` or `cargo` versions are significantly older than the ones mentioned above, consider updating your toolchain using `rustup update`. If Rust is not found at all, refer to the official installation guide: [https://www.rust-lang.org/tools/install](https://www.rust-lang.org/tools/install).
 
-## 5. Setup Instructions
+## Setup Instructions
 
 1.  **Navigate to your repository and branch:** Before creating the project, ensure you are in your training repository's root directory and that you have switched to the appropriate Git branch for this lab. Check for any uncommitted changes from previous work that you may want to save or discard before creating a new project directory.
 2.  **Create a New Rust Project:**
@@ -77,7 +77,7 @@ Imagine you are starting a brand new Rust project. Before diving into complex lo
     *   After installing the extensions, you may need to restart VS Code (`Developer: Reload Window` from the Command Palette, accessed via `Ctrl+Shift+P`/`Cmd+Shift+P`) or wait a moment for `rust-analyzer` to finish its initial setup (downloading components and analyzing your project). You can often see its status in the bottom bar of the VS Code window.
 6.  **Commit often:** As you work through this lab and future exercises, remember to commit your changes frequently using `git commit`. This saves your progress and creates useful checkpoints. Using a structured approach like [Conventional Commits](https://www.conventionalcommits.org/) (e.g., `feat(lab02): initial cargo project setup`, `feat(lab02): added breakpoint and debugged`) can help keep your commit history clean and informative.
 
-## 6. Lab Steps (Iterative Development)
+## Lab Steps (Iterative Development)
 
 *   **Step 1: Examine the Initial Code**
     *   **Task:** Look at the simple "Hello, world!" program that `cargo` automatically generated when you created the project.
@@ -149,7 +149,7 @@ Imagine you are starting a brand new Rust project. Before diving into complex lo
     *   **Explanation:** Clicking "Stop" immediately ends the debugging session and halts the execution of the program that was being debugged.
     *   **Verification:** The Debug toolbar should disappear, the execution highlight is removed, and you are returned to the standard editing and terminal views. The program is no longer running.
 
-## 7. Running the Application / Testing
+## Running the Application / Testing
 
 You have explored the primary ways to run your Rust application in this lab:
 
@@ -163,7 +163,7 @@ You have explored the primary ways to run your Rust application in this lab:
 
 **(Optional) Testing:** While this simple program doesn't include tests, Rust has robust built-in support for testing using functions marked with `#[test]`. Tests are run using the `cargo test` command. Learning to write tests early is highly recommended for building reliable software.
 
-## 8. Key Concepts Review
+## Key Concepts Review
 
 *   **`cargo new`**: Initializes a new Rust project with a standard layout and a `Cargo.toml` manifest file.
 *   **`Cargo.toml`**: The project manifest file, containing metadata, configuration, and dependencies.
@@ -179,7 +179,7 @@ You have explored the primary ways to run your Rust application in this lab:
 *   **Step Over (F10):** A debugger command that executes the current line of code and pauses at the next line within the same function (or the function's caller if the current line is the last).
 *   **DEBUG CONSOLE:** A dedicated panel in VS Code where output from the program being debugged (like `println!`) typically appears.
 
-## 9. (Optional) Challenges / Next Steps
+## (Optional) Challenges / Next Steps
 
 1.  **Multiple Breakpoints:** Add a second line `println!("Learning Rust with VS Code!");` in `main.rs`. Set breakpoints on *both* `println!` lines. Start the debugger (F5) and use "Step Over" (F10) twice to step through each line sequentially, observing the output in the Debug Console after each step.
 2.  **Inspect a Variable:** Modify your `main.rs` to introduce a variable and print it:
@@ -193,7 +193,7 @@ You have explored the primary ways to run your Rust application in this lab:
 3.  **The Rust Book:** Begin reading "The Rust Programming Language" book ([https://doc.rust-lang.org/book/](https://doc.rust-lang.org/book/)), starting with Chapters 1 ("Getting Started") and 2 ("Programming a Guessing Game") to build upon the basics.
 4.  **VS Code Documentation:** Explore the official VS Code documentation specifically for Rust support: [https://code.visualstudio.com/docs/languages/rust](https://code.visualstudio.com/docs/languages/rust).
 
-## 10. (Optional) Troubleshooting
+## (Optional) Troubleshooting
 
 *   **`rust-analyzer` not providing language features:**
     *   Verify that the `rust-analyzer` extension is installed and enabled in the Extensions view (`Ctrl+Shift+X`).
@@ -210,13 +210,13 @@ You have explored the primary ways to run your Rust application in this lab:
     *   Did you start the program using the debugger (F5 or the "Run and Debug" view), or did you just use `cargo run`? Breakpoints are only active when the debugger is attached.
     *   Is the program's execution flow actually reaching the line where the breakpoint is set? (For "Hello, world!", it always does, but for more complex programs, conditional logic might prevent reaching a breakpoint).
 
-## 11. Conclusion
+## Conclusion
 
 Well done! You have successfully set up VS Code for Rust development, created your first Rust project using `cargo`, run it from the integrated terminal, and most importantly, used the integrated debugger to pause execution and step through your code. While "Hello, world!" is a very simple program, the workflow you've practiced here – writing code, running it, and debugging it – is absolutely fundamental to developing Rust applications effectively using a modern IDE like VS Code. Mastering the debugger will be invaluable as you tackle more complex challenges. Keep exploring and building!
 
 Remember to commit the final state of your lab work to your repository using `git commit` and push your changes using `git push` to synchronize them. Following Conventional Commits guidelines will make your project history easy to follow.
 
-## 12. Final Solution Code
+## Final Solution Code
 
 Here is the complete code for `src/main.rs` as it should be after completing the core steps of the lab (before attempting the optional challenges):
 
@@ -227,7 +227,7 @@ fn main() {
 }
 ```
 
-## 13. Check Questions (To Test Understanding)
+## Check Questions (To Test Understanding)
 
 1.  What is the primary role of the `rust-analyzer` extension within VS Code for Rust development?
 2.  Which `cargo` command would you use in the VS Code integrated terminal to compile your program (if necessary) and run it directly, *without* activating the debugger?
@@ -235,7 +235,7 @@ fn main() {
 4.  When running your program under the debugger (e.g., launched with F5), where does the text output generated by a `println!` macro typically appear within the VS Code interface?
 5.  If the debugger is paused on a line of code, what action is performed when you use the "Step Over" command (often bound to the F10 key)?
 
-## 14. Detailed Answers to Check Questions
+## Detailed Answers to Check Questions
 
 1.  **`rust-analyzer` role:** The main purpose of the `rust-analyzer` extension is to provide comprehensive **language intelligence** for Rust inside VS Code. This includes crucial features like real-time diagnostics (syntax errors, warnings), intelligent code completion, code formatting assistance, navigation (like "Go to Definition"), and refactoring tools. It significantly enhances the developer experience by making coding in Rust much more efficient and less error-prone within the editor.
 2.  **Compile and Run command:** The command used in the integrated terminal to compile (if source files have changed) and immediately run your Rust program without involving the debugger is **`cargo run`**.
