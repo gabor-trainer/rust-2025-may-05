@@ -469,4 +469,5 @@ You now have a comprehensive Rust development environment on Windows using VS Co
 5.  Utilize the `cargo` commands (`build`, `run`, `test`, `clippy`, `fmt`, `doc`) for the standard development workflow.
 6.  Use Git and a proper `.gitignore` from the start.
 
-This setup provides a strong foundation. As you work on more complex projects, you can explore the advanced topics mentioned above. Happy coding!
+This custom Rust training was created by IQSOFT - EduTech/gabor for Ericsson – © 2025. 
+All materials are exclusively for use by participants of the training. Sharing or using these materials outside of the training is not permitted without written permission from IQSOFT - EduTech.
