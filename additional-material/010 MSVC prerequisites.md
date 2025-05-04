@@ -32,13 +32,13 @@ This walkthrough uses the Community edition of Visual Studio but the Professiona
 
 The installer will start by linking to the [license][vs licences] and for your edition of Visual Studio and then preparing the installer.
 
-![Accept the license](<.MSVC prerequisites/step1.png>)
-![Installing the installer](<.MSVC prerequisites/step2.png>)
+![Accept the license](<../.media/MSVC prerequisites/step1.png>)
+![Installing the installer](<../.media/MSVC prerequisites/step2.png>)
 
 Once this finishes, you can then select the components to be installed.
 Here we use the "Workload" tab to select the "Desktop Development with C++" workload.
 This will includes all needed components for Rust:
-![Select the C++ Workload](<.MSVC prerequisites/step3.png>)
+![Select the C++ Workload](<../.media/MSVC prerequisites/step3.png>)
 
 ### Installing only the required components (optional)
 
@@ -49,8 +49,8 @@ If you'd like a more minimal install (and won't be doing C++ development) then y
 
 Note that the specific version of the Windows SDK doesn't matter for pure Rust code but if using C++ as well you'll likely want either the latest or whichever version is required by the C++ project (or both).
 
-![Select the latest MSVC component](<.MSVC prerequisites/component-msvc.png>)
-![Select the Windows 11 SDK component](<.MSVC prerequisites/component-sdk.png>)
+![Select the latest MSVC component](<../.media/MSVC prerequisites/component-msvc.png>)
+![Select the Windows 11 SDK component](<../.media/MSVC prerequisites/component-sdk.png>)
 
 ### Adding Language Packs (optional)
 
@@ -59,13 +59,13 @@ Switch to the "Language Packs" tab and add the languages.
 It is recommended that you add the English language pack in addition to your preferred language.
 This will provide English language error messages, which may help when reporting errors.
 
-![Add the English language](<.MSVC prerequisites/step4.png>)
+![Add the English language](<../.media/MSVC prerequisites/step4.png>)
 
 ### Completing the install
 
 Finally click the install button and wait for everything to be installed.
 
-![Wait for the install to complete](<.MSVC prerequisites/step5.png>)
+![Wait for the install to complete](<../.media/MSVC prerequisites/step5.png>)
 
 Once finished, you can continue on to installing Rust.
 
