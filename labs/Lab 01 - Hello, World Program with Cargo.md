@@ -14,15 +14,15 @@ By the end of this lab:
 
 ## Scenario
 
-To begin working with Rust, it's necessary to verify the installation and understand the process of creating, compiling, and running a program. The standard "Hello, World!" example serves this purpose.
+To effectively begin working with Rust, it's crucial to verify your installation and understand the standard process for creating, compiling, and running a program. The classic "Hello, World!" example serves as an excellent starting point for this verification.
 
-Rust's toolchain, particularly `cargo`, facilitates project setup, compilation, and execution. `cargo` handles project creation, dependency management, building, and running, streamlining the development process.
+Rust's official toolchain, particularly `cargo`, significantly simplifies project setup, compilation, and execution. `cargo` handles tasks like project structure creation, dependency management, building executables, and running your code, providing a streamlined development experience.
 
 ## Prerequisites
 
 *   **Software:**
-    *   Rust toolchain (rustc, cargo) installed. The lab uses `edition = "2021"`. Ensure `rustc` version 1.56 or newer is installed.
-    *   A text editor or IDE (e.g., VS Code, Sublime Text, Vim, Emacs).
+    *   Rust toolchain (`rustc`, `cargo`) installed. The lab uses `edition = "2024"`. The lab was tested with `rustc 1.86.0 (05f9846f8 2025-03-31)` and `cargo 1.86.0 (adf9b6ad1 2025-02-28)`. Ensure you have `rustc` version 1.56 or newer installed.
+    *   A text editor or IDE (e.g., VS Code with `rust-analyzer`, Sublime Text, Vim, Emacs).
     *   Access to a terminal or command prompt.
 *   **Knowledge:** Basic command-line usage (navigating directories, running commands) and text file editing. No prior Rust experience is required.
 *   **Setup Verification:** Open your terminal or command prompt and run the following commands to confirm the Rust installation:
@@ -30,139 +30,161 @@ Rust's toolchain, particularly `cargo`, facilitates project setup, compilation, 
     rustc --version
     cargo --version
     ```
-    Output indicating the installed versions should appear. If errors occur, refer to the official Rust installation guide: [https://www.rust-lang.org/tools/install](https://www.rust-lang.org/tools/install)
+    You should see output indicating the installed versions. If errors occur, refer to the official Rust installation guide: [https://www.rust-lang.org/tools/install](https://www.rust-lang.org/tools/install)
 
 ## Setup Instructions
 
-1.  Create a new Rust project using `cargo`. Open a terminal, navigate to your projects directory, and run:
+1.  **Navigate to your repository:** Before creating the project, ensure you are in your training repository's root directory and are on the appropriate branch for this lab. Check for any uncommitted changes from previous work.
+2.  **Create a new Rust project using `cargo`:** Open a terminal, navigate to the directory where you want to place this lab's project (typically within your training repository structure), and run:
     ```bash
-    cargo new hello_world --edition 2021
+    cargo new hello_world --edition 2024
     ```
-    *   `cargo new` creates a new Rust project structure.
-    *   `hello_world` is the project's name; a directory with this name will be created.
-    *   `--edition 2021` specifies the Rust edition.
-2.  Navigate into the project directory:
+    *   `cargo new` is the command to create a new Rust project structure.
+    *   `hello_world` is the desired project's name; a new directory with this name will be created.
+    *   `--edition 2024` specifies the Rust edition to use for this project. Rust editions are opt-in language versions (2015, 2018, 2021, 2024) that allow for non-breaking changes to the language and standard library. Using the latest stable edition (2024) is generally recommended.
+3.  **Remove the generated Git repository:** Since you are working within an existing training monorepo, the `hello_world` project directory created by `cargo new` will contain its own `.git` subfolder. This is redundant and should be removed to avoid nested Git repositories.
+    ```bash
+    # On Linux/macOS/Git Bash
+    rm -rf hello_world/.git
+
+    # On Windows Command Prompt
+    rmdir /s /q hello_world\.git
+
+    # On Windows PowerShell
+    Remove-Item -Recurse -Force hello_world\.git
+    ```
+4.  **Navigate into the project directory:**
     ```bash
     cd hello_world
     ```
-3.  No external dependencies or additional setup steps are needed for this example.
+5.  No external dependencies or additional setup steps are needed for this minimal example.
+6.  **Commit often:** As you progress through the lab, commit your changes frequently using `git commit`. Consider using [Conventional Commits](https://www.conventionalcommits.org/) (e.g., `feat: initial cargo project`, `fix: remove .git subfolder`) to keep your commit history clean and informative.
 
 ## Lab Steps (Iterative Development)
 
 **Step 1: Examine the Initial Project Structure**
 
-*   **Task:** Review the files generated by `cargo`.
+*   **Task:** Review the files and directories generated by `cargo new`.
 *   **Action:** Use a file explorer or a command like `ls` (Linux/macOS) / `dir` (Windows) in the `hello_world` directory. The key items are:
-    *   `Cargo.toml`: The project manifest file (metadata, dependencies).
-    *   `src`: The source code directory.
-    *   `src/main.rs`: The main source file for the executable.
-    *   `.gitignore`: Default Git ignore file.
-*   **Explanation:** `cargo` establishes a standard project layout. Source code resides in `src`. `Cargo.toml` manages project configuration and dependencies.
-*   **Verification:** Familiarize yourself with the file structure.
+    *   `Cargo.toml`: The project manifest file. It contains metadata about your project (name, version, authors, edition) and lists dependencies.
+    *   `src`: This directory contains the project's source code.
+    *   `src/main.rs`: This is the main source file for an executable project. By convention, `cargo` looks for the entry point here.
+    *   `.gitignore`: A standard file to tell Git which files and directories to ignore (like compiled binaries in `target/`).
+*   **Explanation:** `cargo` provides a standard and conventional project layout. Placing source code in `src` and configuration in `Cargo.toml` helps keep projects organized and is expected by the `cargo` tool.
+*   **Verification:** Familiarize yourself with this structure.
 
 **Step 2: Understand the `main` function and `println!`**
 
-*   **Task:** Open `src/main.rs` in a text editor and examine the default code.
-*   **Code Implementation:** The content of `src/main.rs`:
+*   **Task:** Open `src/main.rs` in your text editor or IDE and examine the default code generated by `cargo`.
+*   **Code Implementation:** The content of `src/main.rs` should be:
     ```rust
     fn main() {
         println!("Hello, world!");
     }
     ```
 *   **Explanation:**
-    *   `fn main()`: Defines the `main` function, the entry point for executable Rust programs. `fn` declares a function. `()` indicates no parameters. `{}` encloses the function body.
-    *   `println!("Hello, world!");`: Prints text to the console.
-        *   `println!` is a Rust macro (indicated by `!`). Macros perform compile-time code generation. `println!` handles printing to standard output, appending a newline.
-        *   `"Hello, world!"` is a string literal representing the text to be printed.
-        *   `;` terminates the statement.
-*   **Verification:** Read and understand the code structure.
+    *   `fn main()`: This line defines the `main` function. For executable Rust programs, the `main` function is the **entry point** where the program begins execution. `fn` is the keyword to declare a function. `()` indicates that the function takes no parameters. `{}` encloses the function body, containing the code to be executed.
+    *   `println!("Hello, world!");`: This line prints text to the standard output (your terminal).
+        *   `println!` is a **Rust macro**, indicated by the exclamation mark `!`. Macros are powerful tools that generate code at compile time. `println!` handles the task of writing formatted text to the console, automatically adding a newline at the end.
+        *   `"Hello, world!"` is a **string literal**, the specific text we want to print.
+        *   `;` is used to terminate the statement, similar to many other programming languages.
+*   **Verification:** Read and understand the purpose of each part of this small program.
 
 **Step 3: Run the Program**
 
-*   **Task:** Compile and execute the program using `cargo`.
-*   **Action:** Ensure the terminal is in the `hello_world` directory. Run:
+*   **Task:** Compile and execute the program using the `cargo run` command.
+*   **Action:** Ensure your terminal is currently inside the `hello_world` project directory (`cd hello_world`). Then, run:
     ```bash
     cargo run
     ```
 *   **Explanation:**
-    *   `cargo run` compiles the Rust source code into an executable binary (if changes occurred or it's the first build). The output typically goes to `target/debug/`. You'll see compilation status messages.
-    *   After successful compilation, `cargo run` executes the compiled program.
-*   **Verification:** The following output should appear in the terminal:
-    ```
+    *   When you run `cargo run` for the first time (or after changes), `cargo` first invokes the Rust compiler (`rustc`) to build your project. It compiles the source code (`src/main.rs`) into an executable binary. You will see compilation messages in your terminal, and the compiled executable will be placed in a directory like `target/debug/`.
+    *   After successful compilation, `cargo run` automatically executes the compiled program.
+*   **Verification:** If everything is set up correctly, you should see the following output printed to your terminal:
+    ```text
+        Finished dev [unoptimized + debuginfo] target(s) in X.YZs
+         Running `target/debug/hello_world`
     Hello, world!
     ```
-    This confirms the program compiled and ran as expected.
+    The first few lines show the compilation progress and execution path, followed by the actual output of your program. This confirms that your Rust installation is working and you can compile and run code using `cargo`.
 
 **Step 4: Modify the Output**
 
-*   **Task:** Change the text printed by the program.
-*   **Code Implementation:** Edit `src/main.rs`. Modify the string literal within the `println!` macro call:
+*   **Task:** Change the text that the program prints to the console.
+*   **Code Implementation:** Open `src/main.rs` again in your text editor. Modify the string literal inside the `println!` macro call. For example:
     ```rust
     // In src/main.rs:
     fn main() {
-        // Modify the text inside the quotes.
+        // Modify the text inside the quotes to something else.
         println!("Rust execution successful.");
     }
     ```
-*   **Explanation:** The string literal passed to `println!` determines the output. Save the file after editing.
-*   **Verification:** Optionally, run `cargo check`. This command verifies the code compiles without producing an executable, providing faster error feedback. It should finish without errors if the syntax is correct.
+*   **Explanation:** String literals in Rust are enclosed in double quotes (`"`). By changing the text within these quotes, you directly change what the `println!` macro outputs. Save the file after making your change.
+*   **Verification:** You can use `cargo check` at this point. This command quickly checks your code for syntax and compilation errors without actually building the executable. It's faster than `cargo build` or `cargo run` for catching simple mistakes. Run `cargo check` in your terminal. It should complete without errors if your change was syntactically correct.
 
-**Step 5: Re-run the Program**
+**Step 5: Re-run the Modified Program**
 
-*   **Task:** Compile and run the modified program.
-*   **Action:** In the terminal (within the `hello_world` directory), run:
+*   **Task:** Compile and run the program with your modified output text.
+*   **Action:** In the terminal (still in the `hello_world` directory), run the `cargo run` command again:
     ```bash
     cargo run
     ```
-*   **Explanation:** `cargo` detects changes to source files and recompiles as needed before executing the program.
-*   **Verification:** The new message should be printed to the terminal:
-    ```
+*   **Explanation:** When you run `cargo run` after modifying your source code, `cargo` intelligently detects the changes. It will recompile only the necessary parts of your project (which is just `src/main.rs` in this case) before running the updated executable. You'll see the compilation messages again, likely faster this time, followed by the execution.
+*   **Verification:** Your terminal output should now show the new message you entered:
+    ```text
+        Finished dev [unoptimized + debuginfo] target(s) in X.YZs
+         Running `target/debug/hello_world`
     Rust execution successful.
     ```
+    This confirms that your code changes were compiled and executed successfully.
 
 ## Running the Application / Testing
 
-The primary command used in this lab to compile and run the application is `cargo run`.
+The primary command used throughout this lab to compile and run your application is `cargo run`.
 
-The expected output is the string provided to the `println!` macro (e.g., `Hello, world!` initially, or the modified text later).
+The expected output depends directly on the string literal provided to the `println!` macro in `src/main.rs`. Initially, it was "Hello, world!", and after modification, it reflects your change.
 
-**Other relevant Cargo commands:**
-*   `cargo check`: Checks code for compilation errors without building an executable. Useful for quick syntax checks.
-*   `cargo build`: Compiles the project and creates the executable (e.g., in `target/debug/`) without running it. Use `cargo build --release` for optimized release builds (output in `target/release/`).
+**Other useful Cargo commands you encountered:**
 
-**(Optional) Testing:** While not demonstrated here due to the program's simplicity, larger Rust projects utilize test functions marked with `#[test]`. Tests are typically run using the `cargo test` command.
+*   `cargo check`: Quickly checks your code for compilation errors without producing an executable. Great for fast feedback during coding.
+*   `cargo build`: Compiles your project and creates the executable binary (e.g., in `target/debug/`) but does *not* run it. Use `cargo build --release` to create an optimized version of the executable (output in `target/release/`).
+
+**(Optional) Testing:** While this simple program doesn't require tests, Rust has built-in support for unit, integration, and documentation tests. Test functions are typically marked with the `#[test]` attribute and are run using the `cargo test` command. As you build more complex applications, writing tests will become an essential part of your workflow.
 
 ## Key Concepts Review
 
-*   **`cargo new`**: Creates a standard Rust project structure.
-*   **`Cargo.toml`**: The project manifest file for configuration and dependencies.
-*   **`src/main.rs`**: Default source file for Rust executables.
-*   **`fn main()`**: The required entry point function for executable programs.
-*   **`println!`**: Macro for printing a line of text to standard output.
-*   **`cargo run`**: Compiles and executes the project.
-*   **`cargo check`**: Checks code for errors without a full build.
-*   **`cargo build`**: Compiles the project without running it.
+*   **`cargo new`**: The command to initialize a new Rust project with a standard structure and a `Cargo.toml` manifest.
+*   **`Cargo.toml`**: The project manifest file, crucial for managing project metadata, build settings, and dependencies.
+*   **`src/main.rs`**: The conventional location for the main source file of an executable Rust program, containing the `fn main()` entry point.
+*   **`fn main()`**: The required entry point function for any standalone executable Rust application.
+*   **`println!`**: A standard library macro used for printing formatted output (followed by a newline) to the console.
+*   **`cargo run`**: A convenient command that compiles your project (if needed) and then executes the resulting binary.
+*   **`cargo check`**: A command to quickly verify code correctness by compiling without producing an executable.
+*   **`cargo build`**: A command to compile the project and produce an executable binary without running it.
 
 ## (Optional) Challenges / Next Steps
 
-*   Modify `src/main.rs` to print multiple lines by using `println!` more than once.
-*   Experiment with printing numbers using formatted output: `println!("Value: {}", 42);`. Observe the result.
-*   Consult the official Rust Programming Language book (Chapters 1 and 2) for further introductory material: [https://doc.rust-lang.org/book/](https://doc.rust-lang.org/book/)
+*   Modify `src/main.rs` to print multiple lines of text using several `println!` calls.
+*   Experiment with printing numbers or calculations. For example, try `println!("The result is: {}", 2 + 2);`. The `{}` is a placeholder for values you want to format and print.
+*   Read the first few chapters of the official Rust Programming Language book ([https://doc.rust-lang.org/book/](https://doc.rust-lang.org/book/)), starting with Chapter 1 ("Getting Started") and Chapter 2 ("Programming a Guessing Game") to build upon this foundation.
 
 ## (Optional) Troubleshooting
 
-*   **`error: cannot find function `main` in this scope`**: Ensure `fn main()` is correctly defined in `src/main.rs`.
-*   **`error: unresolved macro `println` / cannot find macro `println!`** : Verify the spelling and the presence of the exclamation mark: `println!`.
-*   **`error: could not find `Cargo.toml`...`**: Make sure `cargo` commands are executed from within the project's root directory (`hello_world`). Use `cd` to navigate if necessary.
-*   **Syntax errors (missing `;`, mismatched `{}`/`()`/`[]`)**: Review the code carefully for typos. `cargo check` often provides specific error messages.
+*   **`error: cannot find function `main` in this scope`**: This usually means you don't have `fn main()` correctly defined in your `src/main.rs` file. Double-check the spelling and syntax.
+*   **`error: unresolved macro `println` / cannot find macro `println!`** : Ensure you have spelled `println!` correctly, including the exclamation mark. This indicates the compiler couldn't find the macro.
+*   **`error: could not find `Cargo.toml` in `...` or any parent directory`**: This error indicates that you are not running the `cargo` command from inside the project's root directory (`hello_world`) or one of its subdirectories. Use `cd hello_world` to navigate to the correct location before running `cargo run`.
+*   **Syntax errors (missing `;`, mismatched `{}`/`()`/`[]`)**: Rust's compiler provides helpful error messages. Read them carefully, paying attention to the line numbers and suggested fixes. `cargo check` is your friend here for faster feedback.
+*   **Issues with `.git`**: If you forgot to remove the `.git` subfolder, your main repository might ignore the `hello_world` folder or you might see unexpected Git behavior within that subfolder. Ensure you deleted it as instructed in the setup.
 
 ## Conclusion
 
-This lab demonstrated the process of creating, compiling, and running a basic Rust program using `cargo`. It covered the roles of `main.rs`, `Cargo.toml`, the `main` function, and the `println!` macro. This forms the basis for developing more complex applications in Rust.
+Congratulations! You have successfully created, modified, compiled, and run your first Rust program using `cargo`. You've learned about the basic project structure, the role of `main.rs` and `Cargo.toml`, the entry point `main` function, and how to print output using the `println!` macro. This foundational knowledge is essential for tackling more complex Rust projects.
+
+Remember to commit your changes to your repository using `git commit` and sync them using `git push` regularly. Using Conventional Commits will help keep your history organized.
 
 ## (Optional) Final Solution Code
 
-Final code for `src/main.rs` (assuming the modification from Step 4):
+Here is the complete code for `src/main.rs` as it would be after completing Step 4:
 
 ```rust
 // Final Code for src/main.rs
@@ -173,18 +195,19 @@ fn main() {
 
 ## Check Questions (To Test Understanding)
 
-1.  What is the purpose of the `fn main()` line in `src/main.rs`?
-2.  Why is `println!` used with an exclamation mark (`!`)?
-3.  What are the two primary actions performed by the `cargo run` command?
-4.  In which directory are source code files typically placed within a Cargo project?
-5.  Which file is used to declare external library dependencies for a Rust project?
+1.  What is the primary role of the `fn main()` function in a Rust executable?
+2.  Why does the `println!` macro have an exclamation mark at the end?
+3.  Describe the two main actions that the `cargo run` command performs when you execute it after making changes to your source code.
+4.  In a standard Cargo project structure, where do you typically find the main source file (`.rs`) for an executable?
+5.  Which file within a Cargo project is used to specify and manage external libraries your project depends on?
 
 ## Detailed Answers to Check Questions
 
-1.  `fn main()` defines the **main function**, which serves as the **entry point** for any executable Rust program. Execution begins within the body (`{}`) of this function.
-2.  The exclamation mark `!` indicates that `println` is a **Rust macro**. Macros operate during compilation to generate code, offering capabilities beyond regular functions, such as handling variable numbers of arguments for formatting.
-3.  `cargo run` performs two main actions:
-    *   **Compile:** It invokes the Rust compiler (`rustc`) to translate source code into machine code, producing an executable file (typically in `target/debug/`). This step may be skipped if the source hasn't changed since the last compilation.
-    *   **Execute:** After successful compilation, it runs the resulting executable program.
-4.  Source code files (`.rs`) are typically located in the **`src` directory** at the root of a Cargo project.
-5.  External library dependencies (crates) are declared in the **`Cargo.toml`** file, usually listed under the `[dependencies]` section.
+1.  The `fn main()` function serves as the **entry point** for any executable Rust program. When the compiled program is run, execution begins at the start of the code block within `main()`.
+2.  The exclamation mark `!` indicates that `println!` is a **macro**, not a regular function. Macros are expanded at compile time and can do things functions cannot, such as taking a variable number of arguments (like `println!("{}", value)`) or generating boilerplate code.
+3.  When you run `cargo run` after making changes, it first **compiles** your source code using `rustc` to create an executable binary (if compilation is needed due to changes). After successful compilation, it then **executes** the compiled binary.
+4.  The main source file for an executable is conventionally placed in the **`src` directory** and named **`main.rs`** (`src/main.rs`).
+5.  External library dependencies, also known as crates, are declared and managed in the **`Cargo.toml`** file, specifically within the `[dependencies]` section.
+
+
+This custom Rust training was created by IQSOFT - EduTech/gabor for Ericsson - Copyright 2025. All materials can be only used exclusively by the participants of the training. The materials are not allowed to be shared or used outside of the training without the written permission of IQSOFT - EduTech/gabor. 
