@@ -1,4 +1,4 @@
-# Lab 03: Building a CLI Tool with `std`, `regex`, and `text-colorizer`
+# Lab 04: Building a CLI Tool with `std`, `regex`, and `text-colorizer`
 
 ## 2. Introduction & Goal
 
