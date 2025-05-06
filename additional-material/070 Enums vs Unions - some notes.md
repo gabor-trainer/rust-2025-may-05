@@ -1,5 +1,6 @@
 # Enums vs Unions: some notes 
 
+
 Rust enums represent a value that can be *one of several possible variants*. Internally, an enum value needs to store two pieces of information:
 
 1.  **The Discriminant:** Which variant the value actually is.
@@ -70,3 +71,5 @@ What this means is that the enum will take up the size of the largest variant, p
 *   **`union`**: **Unsafe**, low-level, union for representing overlapping memory layouts, primarily for FFI  or specific low-level programming scenarios. Use this only when absolutely necessary and with caution.
 
 So, while the `union` keyword exists for specific unsafe use cases, representing distinct variants or possibilities in a safe, high-level way, they way is `enum`. (This is the way :-) as the Mandalorian would say.
+
+[Additional reading: https://en.wikipedia.org/wiki/Tagged_union](https://en.wikipedia.org/wiki/Tagged_union)
