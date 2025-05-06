@@ -66,7 +66,7 @@ What this means is that the enum will take up the size of the largest variant, p
 
 **In Summary:**
 
-*   **`enum`**: **Safe**, idiomatic, tagged union for representing distinct possibilities with compile-time guaranteed variant information. Use this for most scenarios.
-*   **`union`**: **Unsafe**, low-level, untagged union for representing overlapping memory layouts, primarily for FFI  or specific low-level programming scenarios. Use this only when absolutely necessary and with caution.
+*   **`enum`**: **Safe**, idiomatic, way for representing distinct possibilities with compile-time guaranteed variant information. Use this for most scenarios.
+*   **`union`**: **Unsafe**, low-level, union for representing overlapping memory layouts, primarily for FFI  or specific low-level programming scenarios. Use this only when absolutely necessary and with caution.
 
 So, while the `union` keyword exists for specific unsafe use cases, representing distinct variants or possibilities in a safe, high-level way, they way is `enum`. (This is the way :-) as the Mandalorian would say.
