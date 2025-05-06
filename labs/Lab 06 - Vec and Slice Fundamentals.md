@@ -1,4 +1,4 @@
-# Lab 06: `Vec<T>` Fundamentals
+# Lab 06: `Vec<T>` and Slicing Fundamentals
 
 Primary Learning Objective: To understand the core features, flexibility, and heap-based nature of `Vec<T>` in Rust.
 
@@ -460,7 +460,7 @@ fn main() {
     println!("Original vector for mutable slice BEFORE mutation: {:?}", mutable_slice_vec); // Immutable borrow OK here
 
     // Create mutable slice from start (inclusive) up to 5 (exclusive)
-    let mut mutable_char_slice: &mut [char] = &mut mutable_slice_vec[..5]; // Mutable borrow of first part of mutable_slice_vec
+    let mutable_char_slice: &mut [char] = &mut mutable_slice_vec[..5]; // Mutable borrow of first part of mutable_slice_vec
 
     println!("Iterating over the mutable slice (mutable_char_slice) to mutate:");
     for char_ref in mutable_char_slice.iter_mut() { // Iterate over the mutable slice
