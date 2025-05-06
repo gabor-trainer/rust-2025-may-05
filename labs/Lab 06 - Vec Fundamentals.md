@@ -1,9 +1,4 @@
-
 # Lab 06: `Vec<T>` Fundamentals
-
-Welcome to this hands-on lab exploring `Vec<T>` (vectors) in Rust. Unlike fixed-size arrays (`[T; N]`), vectors are growable lists. Their size is not known at compile time, and their data is stored on the heap. Vectors are one of the most commonly used collection types in Rust due to their flexibility.
-
-Understanding vectors is fundamental to working with dynamic data in Rust. This lab will guide you through their creation, growth, shrinking, access methods, different iteration techniques, and memory characteristics, contrasting them with arrays where appropriate.
 
 Primary Learning Objective: To understand the core features, flexibility, and heap-based nature of `Vec<T>` in Rust.
 
@@ -63,12 +58,18 @@ Open `src/main.rs` in your text editor. You will write all the code for the exer
 *   Exercise 1: Vector Creation (`vec![]`, `Vec::new`) and Adding Elements (`push`)
 
     *   **Task:** Create an empty mutable vector of integers using `Vec::new()`. Use the `.push()` method to add several integer values (e.g., 1, 2, 3) one by one. After each `push`, print the vector's contents using debug formatting `{:?}` and its current length using `.len()`. Then, create another vector of characters initialized directly using the `vec![]` macro with initial values (e.g., 'R', 'u', 's', 't'). Print this vector's contents and length. Explain the difference in initial creation syntax.
-    *   **Explanation:** Vectors are dynamically sized, meaning their size can change at runtime. `Vec::new()` creates a vector with a length of 0, and typically a capacity of 0 initially. The `push` method appends elements. The `vec![]` macro provides a convenient way to initialize a vector with data upfront.
+    *   **Explanation:** Vectors are dynamically sized, meaning their size can change at runtime. `Vec::new()` creates a vector with a length of 0, and typically a capacity of 0 initially. The `push` method appends elements. The `vec![]` macro is a convenient way to create a vector and initialize it with a specific set of values at the same time; it also allocates space on the heap to hold these initial values.
     *   **Code Implementation/Hints:**
-        *   Start with `let mut my_vec_new: Vec<i32> = ...;`.
-        *   Use `vector.push(value);` multiple times.
-        *   Use `println!("...", vector, vector.len());` after each `push`.
-        *   Use `let macro_vec: Vec<char> = vec![...];`.
+        ```rust
+        // Inside main()
+        let mut my_vec_new: Vec<i32> = Vec::new();
+        // Add pushes and prints
+        ```
+        ```rust
+        // Inside main() after the above
+        let macro_vec: Vec<char> = vec![/* ... */];
+        // Add print
+        ```
     *   **Verification:** Run `cargo run`. Check that the printed vector contents and lengths correctly reflect the added elements.
 
 *   Exercise 2: Mutability and Indexed Assignment (`[]`)
@@ -76,10 +77,14 @@ Open `src/main.rs` in your text editor. You will write all the code for the exer
     *   **Task:** Given an existing mutable vector of floating-point numbers, change the value located at an existing index (e.g., index 1) using bracket notation (`[]`). Print the value at that index before and after your modification. Explain how this is similar to modifying array elements.
     *   **Explanation:** Just like arrays, you can directly access elements in a vector using their index if the vector is mutable. Be aware that `[]` does *not* perform bounds checking, potentially leading to a crash if the index is invalid.
     *   **Code Implementation/Hints:**
-        *   Create a mutable vector like `let mut float_vec: Vec<f64> = vec![1.1, 2.2, 3.3, 4.4];`.
-        *   Print the value at a specific index using `vector[index]`.
-        *   Modify the value: `vector[index] = new_value;`.
-        *   Print the value again after modification.
+        ```rust
+        // Inside main()
+        let mut float_vec: Vec<f64> = vec![/* ... */];
+        let index_to_change = /* ... */;
+        // Print before
+        // Assign new value using []
+        // Print after
+        ```
     *   **Verification:** Run `cargo run`. Confirm that the value at the specified index has changed in the output.
 
 *   Exercise 3: Safe Indexed Access (`.get()`, `.get_mut()`)
@@ -87,26 +92,31 @@ Open `src/main.rs` in your text editor. You will write all the code for the exer
     *   **Task:** Create a vector of integers. Use the `.get()` method to safely attempt to access an element at a valid index and another attempt at an invalid (out-of-bounds) index. Use `match` statements to handle the `Option` result of `.get()`, printing the value if present or an "index out of bounds" message otherwise. Repeat this process using `.get_mut()` on a mutable vector to safely get a mutable reference to an element at a *valid* index and modify its value within the `match` block, then attempt mutable access at an invalid index. Explain why `.get()` and `.get_mut()` are considered safer than using `[]` directly when the index is not guaranteed to be within bounds.
     *   **Explanation:** When you are unsure if an index is valid, using `[]` will panic if you're wrong. The `.get()` and `.get_mut()` methods return an `Option`, which is `Some` if the index is valid (containing a reference to the element) and `None` if it's invalid. Handling `None` allows your program to continue gracefully instead of crashing.
     *   **Code Implementation/Hints:**
-        *   Create an immutable vector `let safe_vec = vec![10, 20, 30];`.
-        *   Call `safe_vec.get(index)` for a valid and an invalid index.
-        *   Use a `match` statement for the `Option`:
-            ```rust
-            match my_option {
-                Some(value) => { /* print value */ },
-                None => { /* print "out of bounds" */ },
-            }
-            ```
-        *   Repeat with a `mut` vector and `.get_mut(index)`. Remember to dereference `value_ref` to modify: `*value_ref = new_value;`.
-    *   **Verification:** Run `cargo run`. Observe that no panics occur. Check that valid accesses succeed and print values, and invalid accesses print the "out of bounds" message. Verify the element was modified correctly using `.get_mut()`.
+        ```rust
+        // Inside main()
+        let mut safe_vec: Vec<i32> = vec![/* ... */];
+        let valid_index = /* ... */;
+        let invalid_index = /* ... */;
+
+        // Use match with safe_vec.get(index)
+        // Use match with safe_vec.get_mut(index)
+        // Remember to use '*' to dereference inside the Some arm of get_mut
+        // E.g. inside Some(value_ref) => *value_ref = new_value;
+        ```
+    *   **Verification:** Run `cargo run`. Observe that no panics occur. Check that valid accesses succeed and print values, and invalid accesses print the "out of bounds" messages instead of panicking. Verify the element was modified correctly using `.get_mut()`.
 
 *   Exercise 4: Efficient Initialization with Repetition (`vec![value; count]`)
 
-    *   **Task:** Create a large vector of 1000 boolean values, initialized to `false`, using the repetition syntax (`vec![value; count]`). Create another vector of 50 owned strings (`Vec<String>`), initialized to empty strings, using the same syntax (`vec![value.clone(); count]` or `vec![Value::default(); count]` if Value has Default or the specific value is `Clone`). Print the length (`.len()`) and the estimated *capacity* (`.capacity()`) of both vectors after creation. Briefly explain capacity.
+    *   **Task:** Create a large vector of 1000 boolean values, initialized to `false`, using the repetition syntax (`vec![value; count]`). Create another vector of 50 owned strings (`Vec<String>`), initialized to empty strings, using the same syntax (`vec![value.clone(); count]` or equivalent syntax that yields owned `String`s). Print the length (`.len()`) and the estimated *capacity* (`.capacity()`) of both vectors after creation. Briefly explain capacity.
     *   **Explanation:** The repetition syntax is useful for vectors too. When working with types that aren't `Copy` but are `Clone` (like `String`), the value provided in the repetition must be able to be cloned. The vector allocates space based on the `count` but might allocate extra space upfront (capacity) to reduce future reallocations when you push more elements.
     *   **Code Implementation/Hints:**
-        *   Use `let bool_vec: Vec<bool> = vec![false; 1000];`.
-        *   For strings, remember `String::from("")` gives an owned `String`. `String` is `Clone`.
-        *   Use `vector.len()` and `vector.capacity()`.
+        ```rust
+        // Inside main()
+        let bool_vec: Vec<bool> = vec![/* ... */];
+        // Use String::from("") for an owned string value
+        let string_vec: Vec<String> = vec![/* ... */];
+        // Print len() and capacity() for both
+        ```
     *   **Verification:** Run `cargo run`. Check the reported lengths (1000 and 50). The capacity will be at least the length, potentially larger.
 
 *   Exercise 5: Dynamic Growth and Shrinking (`push`, `pop`, `len`, `capacity`)
@@ -114,11 +124,16 @@ Open `src/main.rs` in your text editor. You will write all the code for the exer
     *   **Task:** Create a mutable, empty vector of integers (`Vec<i32>`). Add three numbers using `push()`, printing the vector, length, and capacity after each `push`. Then, use the `.pop()` method once, print the returned value (the removed element, remember it's an `Option`), the vector's new contents, length, and capacity. Explain that `.capacity()` might not decrease immediately after `pop`.
     *   **Explanation:** Vectors manage a heap buffer. `push` increases length and might trigger reallocation to increase capacity. `pop` decreases length, but typically doesn't release the heap memory back immediately.
     *   **Code Implementation/Hints:**
-        *   Start with `let mut dynamic_vec: Vec<i32> = Vec::new();`.
-        *   Use `dynamic_vec.push(...)`.
-        *   Print using `{:?}`, `.len()`, and `.capacity()`.
-        *   Call `dynamic_vec.pop()`, handle the `Option` with `match`.
-        *   Print details again after `pop`.
+        ```rust
+        // Inside main()
+        let mut dynamic_vec: Vec<i32> = Vec::new();
+        // Print initial state
+        // push value 1, print state
+        // push value 2, print state
+        // push value 3, print state
+        // call pop(), handle Option<i32> result
+        // Print final state
+        ```
     *   **Verification:** Run `cargo run`. Follow the length and capacity changes in the output. Note how `capacity` stays the same after `pop`. Confirm `pop` returns the correct last element or `None` if empty.
 
 *   Exercise 6: Iteration over Immutable Vectors (`.iter()`)
@@ -126,10 +141,15 @@ Open `src/main.rs` in your text editor. You will write all the code for the exer
     *   **Task:** Create a vector of strings (`Vec<String>`). Iterate over this vector using the `.iter()` method and `.enumerate()`, printing the index and the *referenced* string (`&String`) for each element in the loop. Explain what type `.iter()` yields references to, just as you did for arrays.
     *   **Explanation:** Iterating with `.iter()` provides read-only access via references. The vector is only borrowed, so you can continue using it after the loop. This is identical behavior to `.iter()` on arrays.
     *   **Code Implementation/Hints:**
-        *   Create `let words: Vec<String> = vec![...];`.
-        *   Use `for (index, word_ref) in words.iter().enumerate() { ... }`. `word_ref` will be of type `&String`.
-        *   Print `index` and `word_ref` (or `*word_ref`).
-        *   Add a print statement *after* the loop that uses the original `words` vector.
+        ```rust
+        // Inside main()
+        use std::string::String;
+        let words: Vec<String> = vec![/* ... */];
+        // Use for loop with .iter().enumerate()
+        // Loop variable will be (index, word_ref), word_ref is &String
+        // Print index and word_ref
+        // Add a print of 'words' *after* the loop
+        ```
     *   **Verification:** Run `cargo run`. The output should show the index and value of each element, and then successfully print the vector contents again after the loop.
 
 *   Exercise 7: Iteration over Mutable Vectors (`.iter_mut()`)
@@ -137,10 +157,15 @@ Open `src/main.rs` in your text editor. You will write all the code for the exer
     *   **Task:** Create a mutable vector of integers. Iterate over this vector using the `.iter_mut()` method. Inside the loop, multiply the element's value by 2 using the mutable reference (`&mut i32`). After the loop, print the vector's contents to confirm the changes, similar to the array exercise.
     *   **Explanation:** `.iter_mut()` provides mutable references, allowing you to modify elements directly within the loop. Like `.iter_mut()` on arrays, this takes a mutable borrow, ensuring unique access during iteration. The original vector variable remains valid.
     *   **Code Implementation/Hints:**
-        *   Create `let mut multiplier_vec: Vec<i32> = vec![...];`.
-        *   Use `for value_ref in multiplier_vec.iter_mut() { ... }`. `value_ref` is of type `&mut i32`.
-        *   Use `*value_ref *= 2;`.
-        *   Print the vector *before* and *after* the loop.
+        ```rust
+        // Inside main()
+        let mut multiplier_vec: Vec<i32> = vec![/* ... */];
+        // Print before loop
+        // Use for loop with .iter_mut()
+        // Loop variable is value_ref of type &mut i32
+        // Dereference to modify: *value_ref = ...
+        // Print after loop
+        ```
     *   **Verification:** Run `cargo run`. Output should show the elements of the vector doubled after the loop.
 
 *   Exercise 8: Iteration and Moving Out (`.into_iter()`)
@@ -148,33 +173,62 @@ Open `src/main.rs` in your text editor. You will write all the code for the exer
     *   **Task:** Create a vector of non-`Copy` type elements, such as `String` (`Vec<String>`). Iterate over this vector using the **`.into_iter()`** method. Inside the loop, print the string value (you will receive the `String` by value). After the loop, attempt to print the *original* vector using debug formatting `{:?}`. Describe the compile-time error or runtime behavior, and explain how `.into_iter()` affects the ownership of both the vector and its elements, contrasting it with `.iter()` and `.iter_mut()`.
     *   **Explanation:** The `.into_iter()` method consumes the vector, transferring ownership of the vector and yielding owned values of its elements. This is the most "destructive" form of iteration but is necessary if you need the actual owned values from the vector's elements.
     *   **Code Implementation/Hints:**
-        *   Create `let consume_vec: Vec<String> = vec![...];`. Make sure these are `String`s (not `&str`).
-        *   Use `for owned_string in consume_vec.into_iter() { ... }`. `owned_string` will be type `String`.
-        *   Inside the loop, use `println!("Consumed element: {}", owned_string);`.
-        *   Add a `println!("consume_vec after .into_iter(): {:?}", consume_vec);` *after* the loop and observe what the compiler says when you run `cargo check`.
-    *   **Verification:** Run `cargo check`. Observe and understand the compile error preventing the use of the vector after `.into_iter()`. If you comment out the problematic line, the code will compile and run, demonstrating iteration by value.
+        ```rust
+        // Inside main()
+        use std::string::String;
+        let consume_vec: Vec<String> = vec![/* ... */];
+        // Use for loop with .into_iter()
+        // Loop variable will be of type String
+        // Print the element inside loop
+        // Add 'println!("{:?}", consume_vec);' AFTER the loop and check compile error.
+        ```
+    *   **Verification:** Run `cargo check`. Observe and understand the compile error that occurs when you try to use the vector after `.into_iter()`. If you comment out the problematic line, the code will compile and run, demonstrating iteration by value.
 
-*   Exercise 9: Slicing Vectors
+*   Exercise 9: Slicing Vectors and Mutable References
 
-    *   **Task:** Create a vector of numbers with at least 10 elements (e.g., numbers 0-9). Create an immutable slice from it including elements from index 5 to 9 (`[5..10]`). Create a mutable slice from a mutable vector including elements from the start up to index 4 (`[..5]`). Iterate over one of these slices (e.g., print elements of the immutable slice). Explain that slicing syntax and behavior is consistent between arrays and vectors because both provide a contiguous memory layout.
-    *   **Explanation:** Both arrays and vectors store data contiguously. This common layout enables slices, which are lightweight views into the underlying data buffer. Slices borrow the data and don't copy it.
+    *   **Task:** Create a vector of integers with at least 10 elements (e.g., numbers 0-9). Create an **immutable slice** referencing elements from index 5 to 9 (`[5..10]`). Print the original vector and the contents of the immutable slice. Next, create a separate **mutable vector** of characters (e.g., 'a' through 'g'). Create a **mutable slice** from this mutable vector, referencing elements from the start up to index 4 (`[..5]`). Iterate over this *mutable slice* using `.iter_mut()` and modify each character in the slice (e.g., change it to 'X'). Finally, print the *mutable vector* again to show the changes that occurred via the slice. Explain how slicing provides a "view" into vector data and how mutable slices enable in-place modification while adhering to Rust's borrowing rules.
+    *   **Explanation:** Vectors, like arrays, store their data contiguously. This common layout enables slices (`&[T]` for immutable views, `&mut [T]` for mutable views), which are lightweight references containing a pointer and length. Slicing doesn't copy data. Creating a mutable slice (`&mut [T]`) means you have exclusive mutable access to *that specific part* of the vector, which is useful for targeted modifications. Rust's borrowing rules prevent simultaneously having multiple mutable borrows, or a mutable borrow and an immutable borrow, on the same data (or overlapping parts of data) at the same time. We will ensure we respect these rules.
     *   **Code Implementation/Hints:**
-        *   Create a vector: `let numbers_for_slice: Vec<i32> = (0..10).collect();`.
-        *   Create mutable vector: `let mut mutable_slice_vec: Vec<char> = vec!['a', 'b', 'c', 'd', 'e', 'f', 'g'];`.
-        *   Create immutable slice: `let my_slice: &[i32] = &numbers_for_slice[start..end];`.
-        *   Create mutable slice: `let mut mutable_char_slice: &mut [char] = &mut mutable_slice_vec[..end];`.
-        *   Use a `for` loop to iterate over `my_slice`.
-    *   **Verification:** Run `cargo run`. The output should show the elements from the immutable slice. The code should compile without errors, confirming the validity of the slicing syntax.
+        ```rust
+        // Inside main()
+        let numbers_for_slice: Vec<i32> = (0..10).collect();
+        // Create immutable slice using &[] with a range like [start..end]
+        let my_immutable_slice: &[i32] = ... ;
+        // Print original vector and the immutable slice
+
+        let mut mutable_slice_vec: Vec<char> = vec!['a', 'b', 'c', 'd', 'e', 'f', 'g'];
+        // Print the mutable vector *before* creating the mutable slice
+
+        // Create mutable slice using &mut [] with a range like [..end]
+        let mut mutable_char_slice: &mut [char] = ... ;
+
+        // Iterate over mutable_char_slice using .iter_mut()
+        // Inside the loop, use '*char_ref = 'X';" to modify
+
+        // Print the mutable vector *after* the mutable_char_slice has finished being used
+        // (e.g., after the loop finishes, the mutable borrow typically ends)
+        ```
+    *   **Verification:** Run `cargo run`. The output should show the original mutable vector state, then after the loop iterating over the mutable slice, the print of the mutable vector should show the characters within the slice's range have been modified.
 
 *   Exercise 10: Vector Copy/Move Semantics (Passing by Value)
 
     *   **Task:** Create a vector of integers (`Vec<i32>`). Write a function that takes a `Vec<i32>` by value (`fn process_vec(v: Vec<i32>) { ... }`). Pass your `Vec<i32>` from `main` to this function. After the function call returns in `main`, attempt to print the *original* vector using debug formatting. Describe the compile-time error that occurs and explain *why* Rust prevents this, relating it to the `Vec`'s heap ownership and `Move` semantics. Contrast this behavior with passing a `Copy` array by value (as you did in the array lab).
     *   **Explanation:** `Vec<T>` is not a `Copy` type because it manages a heap allocation. Passing a vector by value results in a move of ownership of the vector structure (including the pointer to the heap data). The original variable becomes invalid.
     *   **Code Implementation/Hints:**
-        *   Create `let move_vec: Vec<i32> = vec![10, 20, 30];` in `main`.
-        *   Define `fn process_vec(v: Vec<i32>) { ... }`. Maybe print `v.len()` inside.
-        *   Call `process_vec(move_vec);`.
-        *   Add a `println!("move_vec after function call: {:?}", move_vec);` after the call and observe the compiler error.
+        ```rust
+        // Inside main()
+        let move_vec: Vec<i32> = vec![/* ... */];
+        // Print before call
+        process_vec(move_vec); // Call the function
+
+        // Add 'println!("{:?}", move_vec);' after the call and check compile error.
+        ```
+        ```rust
+        // Add this function outside of main
+        fn process_vec(v: Vec<i32>) {
+            // Optionally print something from v
+        }
+        ```
     *   **Verification:** Run `cargo check`. Note down the specific compile error about the value being moved.
 
 *   Exercise 11: Comparing Vectors (`==`)
@@ -182,8 +236,14 @@ Open `src/main.rs` in your text editor. You will write all the code for the exer
     *   **Task:** Create two vectors with the same integer values in the same order. Create a third vector with the same integer values but in a different order, or with a different length, or with different values. Use Rust's standard comparison operators (`==`, `!=`) to compare the vectors for equality and print the boolean result. Explain when two vectors are considered equal, highlighting that it depends on both length and element values.
     *   **Explanation:** Vectors can be compared for equality using `==` and inequality using `!=` *if* their element type `T` implements `PartialEq`. Equality means both vectors have the *same length* AND all elements at corresponding positions are equal.
     *   **Code Implementation/Hints:**
-        *   Create three `Vec<i32>` instances, two identical in value and order, one different.
-        *   Use `println!("vector1 == vector2: {}", vector1 == vector2);`.
+        ```rust
+        // Inside main()
+        let vector1: Vec<i32> = vec![/* ... */];
+        let vector2: Vec<i32> = vec![/* ... */]; // Same
+        let vector3: Vec<i32> = vec![/* ... */]; // Different
+
+        // Use println! with == and !=
+        ```
     *   **Verification:** Run `cargo run`. Output should show the expected boolean results of the comparisons.
 
 Running the Application / Testing
@@ -238,7 +298,7 @@ Remember to commit the final state of your project to your Git repository using 
 ```rust
 // Final Code for src/main.rs
 
-use std::string::String;
+use std::string::String; // Needed for String type
 
 // Helper function for Exercise 10
 fn process_vec(v: Vec<i32>) { // Takes ownership of the vector
@@ -262,6 +322,7 @@ fn main() {
     println!("macro_vec: {:?}, length: {}", macro_vec, macro_vec.len());
     println!("Explanation: Vec::new() creates an empty vector; vec![] creates one with initial elements.");
 
+
     println!("\n--- Exercise 2: Mutability and Indexed Assignment ([]) ---");
     let mut float_vec: Vec<f64> = vec![1.1, 2.2, 3.3, 4.4];
     let index_to_change = 1;
@@ -271,6 +332,7 @@ fn main() {
     println!("float_vec after change: {:?}", float_vec);
     println!("Value at index {} after change: {}", index_to_change, float_vec[index_to_change]);
     println!("Explanation: Mutating by index is similar to arrays for valid indices.");
+
 
     println!("\n--- Exercise 3: Safe Indexed Access (.get(), .get_mut()) ---");
     let mut safe_vec: Vec<i32> = vec![10, 20, 30];
@@ -288,19 +350,22 @@ fn main() {
     }
 
     println!("Attempting safe mutable access (.get_mut):");
-    match safe_vec.get_mut(valid_index) { // .get_mut requires a mutable vector
+    // Need a mutable vector to call get_mut()
+    // Used 'safe_vec' again since it was mutable from previous step
+    match safe_vec.get_mut(valid_index) {
         Some(value_ref) => {
             println!("Index {} is valid for mutable access, original value: {}", valid_index, value_ref);
             *value_ref = 99; // Modify the value via the mutable reference
-            println!("Value after modification: {}", safe_vec[valid_index]);
+            println!("Value after modification: {}", safe_vec[valid_index]); // Verify change
         },
         None => println!("Index {} is out of bounds for mutable access!", valid_index),
     }
-     match safe_vec.get_mut(invalid_index) { // This match will hit the None arm
+     match safe_vec.get_mut(invalid_index) {
          Some(value_ref) => { println!("Index {} is valid for mutable access, original value: {}", invalid_index, value_ref); },
          None => println!("Index {} is out of bounds for mutable access!", invalid_index),
      }
     println!("Explanation: .get/.get_mut return Option, preventing panic on invalid index.");
+
 
     println!("\n--- Exercise 4: Efficient Initialization with Repetition (vec![value; count]) ---");
     let thousands_of_false: Vec<bool> = vec![false; 1000];
@@ -379,34 +444,43 @@ fn main() {
     println!("Explanation: .into_iter() moves the vector (consumes it), yielding owned elements (T). Original variable is invalidated.");
 
 
-    println!("\n--- Exercise 9: Slicing Vectors ---");
+    println!("\n--- Exercise 9: Slicing Vectors and Mutable References ---");
     let numbers_for_slice: Vec<i32> = (0..10).collect(); // Creates a vector with numbers 0 through 9
     let mut mutable_slice_vec: Vec<char> = vec!['a', 'b', 'c', 'd', 'e', 'f', 'g'];
 
-    // Immutable slice from index 5 (inclusive) up to 10 (exclusive)
-    let my_slice: &[i32] = &numbers_for_slice[5..10];
+    // Create immutable slice from index 5 (inclusive) up to 10 (exclusive)
+    let my_immutable_slice: &[i32] = &numbers_for_slice[5..10]; // Immutable borrow of numbers_for_slice
 
-    // Mutable slice from start (inclusive) up to 5 (exclusive)
-    let mut mutable_char_slice: &mut [char] = &mut mutable_slice_vec[..5];
-
+    // Print original immutable vector and its slice - No conflicts here
     println!("Original vector for immutable slice: {:?}", numbers_for_slice);
-    println!("Created slice (&[i32]): {:?}", my_slice);
-    println!("Original vector for mutable slice: {:?}", mutable_slice_vec);
-    println!("Created mutable slice (&mut [char]): {:?}", mutable_char_slice);
+    println!("Created immutable slice (&[i32]): {:?}", my_immutable_slice);
 
-    println!("Iterating over the immutable slice:");
-    for element in my_slice { // Slices are iterable
-        println!("Slice element: {}", element);
-    }
-    println!("Explanation: Slices (&[T], &mut [T]) provide views into contiguous vector data without copying, syntax similar to arrays.");
+
+    // Print original mutable vector *before* creating the mutable slice borrow
+    println!("Original vector for mutable slice BEFORE mutation: {:?}", mutable_slice_vec); // Immutable borrow OK here
+
+    // Create mutable slice from start (inclusive) up to 5 (exclusive)
+    let mut mutable_char_slice: &mut [char] = &mut mutable_slice_vec[..5]; // Mutable borrow of first part of mutable_slice_vec
+
+    println!("Iterating over the mutable slice (mutable_char_slice) to mutate:");
+    for char_ref in mutable_char_slice.iter_mut() { // Iterate over the mutable slice
+         *char_ref = 'X'; // Modify the character via the mutable reference
+    } // <-- The mutable borrow 'mutable_char_slice' ends here as it goes out of scope
+
+    // Now the mutable borrow is finished, we can take another borrow (like immutable for println)
+    println!("Original vector for mutable slice AFTER mutation: {:?}", mutable_slice_vec); // Immutable borrow OK again
+
+    println!("Explanation: Slices (&[T], &mut [T]) provide views into contiguous vector data without copying, syntax similar to arrays. Rust's borrowing rules prevent simultaneous mutable and immutable borrows of overlapping data.");
 
 
     println!("\n--- Exercise 10: Vector Copy/Move Semantics (Passing by Value) ---");
     let move_vec: Vec<i32> = vec![10, 20, 30];
     println!("move_vec before function call: {:?}", move_vec);
     process_vec(move_vec); // Passing by value moves ownership
+
     // Uncomment the next line to see the compile error:
     // println!("move_vec after function call: {:?}", move_vec); // COMPILE ERROR
+
     println!("Explanation: Vec<T> is NOT Copy due to heap ownership. Passing by value moves ownership, invalidating the original.");
 
 
@@ -454,6 +528,5 @@ Detailed Answers to Check Questions
 4.  The `.iter()` method creates an iterator that yields **immutable references (`&T`)** to the vector's elements. It takes an immutable borrow (`&self`) of the vector. The original vector remains valid and can be used or borrowed again after the iteration finishes. The `.into_iter()` method creates an iterator that **consumes** the vector itself (it takes ownership, `self`) and yields **owned values (`T`)** of its elements. After calling `.into_iter()`, the original vector variable is moved and becomes invalid, meaning you can no longer use it.
 5.  When passing a `Vec<T>` to a function **by value** (`fn process_vec(v: Vec<i32>)`), the vector is **moved**, not copied. This is because `Vec<T>` manages a heap allocation and does not implement the `Copy` trait. The ownership of the vector's structure (pointer, length, capacity) is transferred to the function parameter (`v`). The original vector variable in the calling scope (e.g., `main`) becomes invalid, and any subsequent attempt to use it will result in a compile-time error, enforcing Rust's ownership rules and preventing issues like double-freeing the vector's heap buffer.
 
----
-
+***
 This custom Rust training was created by IQSOFT - EduTech/gabor for Ericsson – © 2025. All materials are exclusively for use by participants of the training. Sharing or using these materials outside of the training is not permitted without written permission from IQSOFT - EduTech
