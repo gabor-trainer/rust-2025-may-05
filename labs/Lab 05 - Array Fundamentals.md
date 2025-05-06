@@ -231,7 +231,7 @@ fn main() {
     println!("--- Exercise 1: Fixed Size Creation and Basic Access ---");
     // Task: Create a mutable fixed-size array of exactly 7 integers. Assign values directly.
     // Access and print elements at index 0 and index 6.
-    let mut my_array: [i32; 7] = [10, 20, 30, 40, 50, 60, 70];
+    let my_array: [i32; 7] = [10, 20, 30, 40, 50, 60, 70];
     println!("Array: {:?}", my_array);
     println!("First element (index 0): {}", my_array[0]);
     println!("Last element (index 6): {}", my_array[6]);
