@@ -52,3 +52,9 @@ ___
 
 -   On Windows with Rust MSVC toolchain: use **MSVC compiler**.
 -   On Windows with Rust GNU toolchain: use **MinGW-w64** (install via MSYS2 for best results).
+-   
+
+---
+
+*This custom Rust training was created by **IQSOFT - EduTech/gabor for Ericsson – © 2025**. 
+All materials are exclusively for use by participants of the training. Using these materials outside of the training is not permitted without written permission from IQSOFT - EduTech.*

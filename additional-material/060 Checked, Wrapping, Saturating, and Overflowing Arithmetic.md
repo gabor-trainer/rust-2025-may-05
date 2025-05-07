@@ -211,3 +211,8 @@ For integer overflow or underflow in `checked_*` methods:
 Using `Option` is simpler and more idiomatic in this case because `None` perfectly captures the state "the intended numerical result is not representable by this type." A `Result` would require defining an `ErrorType` (perhaps an empty struct or enum) just to signal "overflow/underflow occurred," which adds unnecessary boilerplate compared to the simple `None`.
 
 **To be short:** `Option` signifies "no value could be produced," while `Result` signifies "an operation failed for a specific reason." Checked integer arithmetic falls into the "no value could be produced (within the type's limits)" category.    
+
+---
+
+*This custom Rust training was created by **IQSOFT - EduTech/gabor for Ericsson – © 2025**. 
+All materials are exclusively for use by participants of the training. Using these materials outside of the training is not permitted without written permission from IQSOFT - EduTech.*

@@ -383,3 +383,8 @@ In summary:
 *   **`Clone` + `Drop` = Allowed:** Explicitly cloning a resource-owning type (`Clone`) is allowed because `clone()` is designed to create an *independent* copy of the resource, allowing each instance to be dropped safely.
 
 When you use `#[derive(Copy)]` on a struct or enum, the compiler is checking not only that all its fields are `Copy`, but also that none of them (or the type itself) have a custom `Drop` implementation. If any field requires `Drop`, the derive will fail.
+
+---
+
+*This custom Rust training was created by **IQSOFT - EduTech/gabor for Ericsson – © 2025**. 
+All materials are exclusively for use by participants of the training. Using these materials outside of the training is not permitted without written permission from IQSOFT - EduTech.*

@@ -73,3 +73,8 @@ What this means is that the enum will take up the size of the largest variant, p
 So, while the `union` keyword exists for specific unsafe use cases, representing distinct variants or possibilities in a safe, high-level way, they way is `enum`. (This is the way :-) as the Mandalorian would say.
 
 [Additional reading: https://en.wikipedia.org/wiki/Tagged_union](https://en.wikipedia.org/wiki/Tagged_union)
+
+---
+
+*This custom Rust training was created by **IQSOFT - EduTech/gabor for Ericsson – © 2025**. 
+All materials are exclusively for use by participants of the training. Using these materials outside of the training is not permitted without written permission from IQSOFT - EduTech.*
