@@ -528,5 +528,6 @@ Detailed Answers to Check Questions
 4.  The `.iter()` method creates an iterator that yields **immutable references (`&T`)** to the vector's elements. It takes an immutable borrow (`&self`) of the vector. The original vector remains valid and can be used or borrowed again after the iteration finishes. The `.into_iter()` method creates an iterator that **consumes** the vector itself (it takes ownership, `self`) and yields **owned values (`T`)** of its elements. After calling `.into_iter()`, the original vector variable is moved and becomes invalid, meaning you can no longer use it.
 5.  When passing a `Vec<T>` to a function **by value** (`fn process_vec(v: Vec<i32>)`), the vector is **moved**, not copied. This is because `Vec<T>` manages a heap allocation and does not implement the `Copy` trait. The ownership of the vector's structure (pointer, length, capacity) is transferred to the function parameter (`v`). The original vector variable in the calling scope (e.g., `main`) becomes invalid, and any subsequent attempt to use it will result in a compile-time error, enforcing Rust's ownership rules and preventing issues like double-freeing the vector's heap buffer.
 
-***
-This custom Rust training was created by IQSOFT - EduTech/gabor for Ericsson – © 2025. All materials are exclusively for use by participants of the training. Sharing or using these materials outside of the training is not permitted without written permission from IQSOFT - EduTech
+---
+
+This custom Rust training was created **by IQSOFT - EduTech/gabor for Ericsson – © 2025**. All materials are exclusively for use by participants of the training. Sharing or using these materials outside of the training is not permitted without written permission from IQSOFT - EduTech
