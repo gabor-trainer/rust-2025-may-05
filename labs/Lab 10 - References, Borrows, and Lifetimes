@@ -611,3 +611,8 @@ Before concluding your session, remember to commit your changes (`git commit -am
     *   Any number of **shared** (immutable) references (`&T`).
     You cannot have a mutable borrow active at the same time as any other borrow (mutable or shared) to the same data.
 5.  The typical lifetime of a reference obtained from a temporary value is very short. By default, temporary values in Rust are dropped at the **end of the statement** in which they are created. Therefore, a reference taken to such a temporary value is only guaranteed to be valid *within that single statement*. Trying to use the reference in subsequent statements will result in a compile-time error because the data it points to has already been dropped. To extend the lifetime of the data and the reference, you must bind the temporary value to a variable (e.g., `let my_var = some_expression();`) which extends the value's lifetime to the scope of `my_var`.
+   
+---
+
+*This custom Rust training was **created by IQSOFT - EduTech/gabor for Ericsson – © 2025.**
+All materials are exclusively for use by participants of the training. Sharing or using these materials outside of the training is not permitted without written permission from IQSOFT - EduTech.*
