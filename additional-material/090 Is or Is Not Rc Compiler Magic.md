@@ -48,3 +48,9 @@ It's more accurate to say that `Rc<T>` is a **controlled extension** or a **mana
 However, it **extends the *basic model*** of single-variable ownership and tree-like structures to allow for **shared ownership** scenarios. It achieves this by introducing a runtime reference count alongside the data. Each `Rc<T>` handle is an independent owner of its own handle, and collectively, these handles (via the reference count) manage the lifetime of the shared heap data.
 
 So, while the diagram of ownership relationships becomes more of a Directed Acyclic Graph (DAG) instead of a strict tree when `Rc<T>` is used, the fundamental safety guarantee – that the data is dropped exactly once when no active owners remain – is maintained. It's a carefully designed library type that operates within Rust's safety constraints using lower-level features, rather than a compiler-level bypass of the ownership rules.
+
+---
+
+*This custom Rust training was created by **IQSOFT - EduTech/gabor for Ericsson – © 2025**. 
+All materials are exclusively for use by participants of the training. Using these materials outside of the training is not permitted without written permission from IQSOFT - EduTech.*
+
