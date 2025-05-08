@@ -316,6 +316,7 @@ fn process_slice(input: &str) -> String {
 Before concluding your session, remember to commit your changes (`git commit -am "feat: complete string lab"` - using conventional commits) and synchronize them with your remote repository (`git push`).
 
 
-This custom Rust training was created by IQSOFT - EduTech/gabor for Ericsson – © 2025.
-All materials are exclusively for use by participants of the training. Sharing or using these materials outside of the training is not permitted without written permission from IQSOFT - EduTech.
+---
 
+*This custom Rust training was created by **IQSOFT - EduTech/gabor for Ericsson – © 2025.**
+All materials are exclusively for use by participants of the training. Sharing or using these materials outside of the training is not permitted without written permission from IQSOFT - EduTech.*

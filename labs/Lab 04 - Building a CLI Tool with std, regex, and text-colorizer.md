@@ -616,5 +616,7 @@ World, world, world!
 4.  The `?` operator is syntactic sugar for handling `Result` and `Option` enums. When applied to a `Result<T, E>`, it checks if the result is `Ok(T)` or `Err(E)`. If it's `Ok(T)`, the `Ok` value (`T`) is extracted, and the operation continues. If it's `Err(E)`, the error value (`E`) is immediately returned from the *current function* (`replace` in this case), wrapped in an `Err`. For `?` to work on `Result<T, E>`, the function it's used within *must* return a `Result` type where the error type is compatible with or converts into the function's declared error type (`regex::Error` for `replace`).
 5.  We used `.clone()` because the `args` vector owns the `String`s collected from `env::args()`. The `parse_args` function creates this vector, and the vector is dropped (its memory is freed) when the function finishes. However, the `Arguments` struct that we return from `parse_args` needs to hold onto those string values *after* the function returns. By calling `.clone()`, we create *new* `String`s with the same content, transferring ownership of these new strings to the `Arguments` struct. This ensures the struct's fields remain valid after the `args` vector is gone.
 
-***
-This custom Rust training was created by IQSOFT - EduTech/gabor for Ericsson – © 2025. All materials are exclusively for use by participants of the training. Sharing or using these materials outside of the training is not permitted without written permission from IQSOFT - EduTech
+---
+
+*This custom Rust training was created by **IQSOFT - EduTech/gabor for Ericsson – © 2025.**
+All materials are exclusively for use by participants of the training. Sharing or using these materials outside of the training is not permitted without written permission from IQSOFT - EduTech.*
