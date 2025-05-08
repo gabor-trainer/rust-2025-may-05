@@ -1,0 +1,613 @@
+**Lab 10: References, Borrows, and Lifetimes**
+
+Rust's memory safety guarantees are powered by its ownership and borrowing system, including the concept of lifetimes. While incredibly powerful, these concepts, especially when dealing with references and mutable data, can present scenarios that differ significantly from patterns common in languages like C++ or Python, sometimes leading to non-intuitive compile errors. This lab is designed to confront those scenarios directly through targeted exercises.
+
+By the end of this lab, you will be able to:
+
+*   Understand and avoid the "dangling reference" problem.
+*   Correctly use lifetime parameters in function signatures.
+*   Annotate structs that hold references with lifetimes.
+*   Navigate and resolve conflicts with simultaneous mutable and immutable borrows.
+*   Understand the lifetimes of temporary values.
+*   Reason about borrows across different control flow paths.
+*   Handle borrowing from and modifying collections safely.
+
+This lab requires you to engage with the Rust compiler, treating its error messages as guides rather than obstacles. Each compile error is an opportunity to learn *why* Rust enforces specific rules for memory safety.
+
+**Prerequisites**
+
+*   **Software:**
+    *   Rust toolchain (`rustc`, `cargo`) installed. We will use Rust `edition = "2024"`. This lab was tested with `rustc 1.86.0 (05f9846f8 2025-03-31)` and `cargo 1.86.0 (adf9b6ad1 2025-02-28)`.
+    *   Text editor or IDE (e.g., VS Code with rust-analyzer).
+*   **Knowledge:**
+    *   Basic Rust syntax (variables, functions, `println!`, `if/else`, loops, `Vec`, structs).
+    *   A foundational understanding of Rust's ownership and move semantics. Familiarity with shared (`&`) and mutable (`&mut`) references.
+*   **Setup Verification:** Open your terminal and run `rustc --version` and `cargo --version` to confirm your installation.
+
+**Setup Instructions**
+
+Before starting, ensure you are in your designated training repository. Check that you are on the appropriate branch and that you have no uncommitted changes (`git status`). It's recommended to commit frequently using [Conventional Commits](https://www.conventionalcommits.org/) to track your progress (e.g., `feat: initial borrowing lab setup`, `feat: complete borrowing exercise 1`).
+
+1.  **Create a New Cargo Project:**
+    Navigate to where you want to create your project in your terminal.
+    ```bash
+    cargo new borrowing_lab --edition 2024
+    ```
+    The `edition` flag can be set to `2015`, `2018`, `2021`, or `2024`. We're using the latest for this lab.
+
+2.  **Navigate into the Project Directory:**
+    ```bash
+    cd borrowing_lab
+    ```
+
+3.  **Open the Project in Your Editor:**
+    Open the `borrowing_lab` directory in your preferred text editor or IDE. You will be primarily working with the `src/main.rs` file.
+
+You are now ready to begin the exercises. Implement the code for each exercise sequentially in the `main` function within your `src/main.rs` file. Use comments (`//`) to separate and label the code for each exercise. Focus on understanding *why* the initial intuitive code fails and *how* the correct Rust solution works.
+
+**Lab Steps (Exercises)**
+
+Implement the code for each exercise inside the `main` function in `src/main.rs`.
+
+1.  **Function Returning a Reference: The "Dangling Reference" Problem (Attempt 1)**
+    *   **Exercise Type Goal:** Understand that references returned by a function cannot point to data defined *inside* that function, as the data is dropped upon return.
+    *   **Trap:** Trying to mimic returning a pointer to a local variable from C++.
+    *   Define a function `create_and_return_string_ref`. Inside this function, create a `String` (e.g., `"function data"`. Try to return a `&str` slice that refers to this local string.
+    *   In `main`, call this function and try to print the returned reference.
+    *   **Observe:** A compile error indicating a lifetime issue – the data doesn't live long enough. Explain why this is unsafe.
+    *   **Verification:** Run `cargo check`. The compiler error is the expected outcome for the initial attempt.
+
+2.  **Function Returning a Reference: The "Dangling Reference" Problem (Attempt 2)**
+    *   **Exercise Type Goal:** Further reinforce the dangling reference rule, maybe with a slightly different structure.
+    *   **Trap:** Believing that moving the data out of the function into the return value makes the reference valid (it doesn't - the reference still points to the original location that is about to be dropped).
+    *   Define a function `create_string_and_return_ref`. Inside this function, create a `String`. Try to return *both* the `String` value and a reference (`&str`) to a slice of that string in a tuple `(String, &str)`.
+    *   In `main`, call this function and try to use the returned tuple.
+    *   **Observe:** Another compile error.
+    *   **Discuss:** Even though the `String` *value* is moved out, the reference points to the memory *location* it occupied *inside* the function, which is still being dropped. The reference becomes invalid.
+    *   **Verification:** Run `cargo check`. The compiler error is the expected outcome.
+
+3.  **Function Returning a Reference Dependent on Multiple Input Lifetimes (Example 1)**
+    *   **Exercise Type Goal:** Learn how to use lifetime parameters on function signatures when the return reference's lifetime depends on one of the input references.
+    *   **Trap:** Omitting lifetime annotations and expecting the compiler to always figure it out, or thinking the returned reference can live as long as *any* input.
+    *   Define a function `first_or_second` that takes two `&str` parameters, `s1` and `s2`, and returns a `&str` that is either `s1` or `s2` based on some simple logic (e.g., if `s1` starts with 'A'). Start *without* explicit lifetime parameters.
+    *   **Observe:** The compiler will likely require lifetime parameters on the function signature.
+    *   **Correct:** Add the lifetime parameter `'a` to the function signature and the references to indicate that the returned reference lives at least as long as the *input* references. Example: `fn first_or_second<'a>(s1: &'a str, s2: &'a str) -> &'a str`. Implement the logic and call the function from `main` with string literals.
+    *   **Verification:** Run `cargo run`. The code should compile and print the chosen string slice.
+
+4.  **Function Returning a Reference Dependent on Multiple Input Lifetimes (Example 2)**
+    *   **Exercise Type Goal:** Apply lifetime parameters to a function returning a reference derived from its inputs in a slightly different scenario.
+    *   **Trap:** Not understanding which input lifetime the output depends on.
+    *   Define a function `combine_and_slice` that takes a `&String` and a `&str`. Imagine it conceptually combines them (you don't need to actually build a new string) and returns a slice of the *first* input `&String` (or a slice of the `&str` if the `&String` is empty - keep it simple, always slice the `&String`). Start without lifetime parameters.
+    *   **Observe:** The compiler will require lifetime parameters.
+    *   **Correct:** Add the necessary lifetime parameter `'a` to the function signature and the *relevant* input reference (`&'a String`) and the return type (`&'a str`) to indicate the output slice's lifetime is tied to the input `String`. Call the function from `main` with a `String` and a string literal.
+    *   **Verification:** Run `cargo run`. The code should compile and return a slice from the first string.
+
+5.  **Structs Holding Multiple References with Different Lifetimes (Example 1)**
+    *   **Exercise Type Goal:** Learn how to annotate structs with lifetime parameters when they hold references.
+    *   **Trap:** Defining structs with reference fields without lifetime parameters.
+    *   Define a struct `ConfigRef` with two `&str` fields, `key` and `value`. Do not add any lifetime parameters initially.
+    *   **Observe:** A compile error requiring lifetime parameters on the struct.
+    *   **Correct:** Add appropriate lifetime parameters to the struct definition. Since the `key` and `value` might come from sources with different lifetimes, you need two distinct lifetime parameters: `struct ConfigRef<'a, 'b> { key: &'a str, value: &'b str }`.
+    *   In `main`, create two different string literals (which have `'static` lifetimes). Create an instance of `ConfigRef` using slices from these literals. This should compile fine as string literals have long lifetimes.
+    *   **Verification:** Run `cargo run`. The code should compile and you can optionally print the struct instance (if you derive `Debug`).
+
+6.  **Structs Holding Multiple References with Different Lifetimes (Example 2 - The Outliving Trap)**
+    *   **Exercise Type Goal:** Understand that an instance of a struct holding references cannot outlive the data pointed to by *any* of its reference fields. The struct's lifetime is limited by the *shortest* lived data it borrows from.
+    *   **Trap:** Creating a struct instance using references to data with different scopes and trying to use the struct instance after the shorter-lived data has gone out of scope.
+    *   Use the `ConfigRef<'a, 'b>` struct definition from the previous exercise.
+    *   In `main`, create an outer scope `String` (`outer_string`) and an inner `{}` block. Inside the inner block, create another `String` (`inner_string`).
+    *   Inside the inner block, create an instance of `ConfigRef`, taking a slice from `outer_string` for `key` and a slice from `inner_string` for `value`.
+    *   Try to use the `ConfigRef` instance (e.g., print its fields) *after* the inner block ends.
+    *   **Observe:** A compile error because the `ConfigRef` instance attempts to outlive the `inner_string` it borrows from. Explain why this is unsafe and forbidden.
+    *   **Verification:** Run `cargo check`. The lifetime error is the expected outcome.
+
+7.  **Simultaneous Borrows: Mutable vs. Immutable Conflicts (Example 1 - Simple Variable)**
+    *   **Exercise Type Goal:** Directly experience the rule: one mutable borrow OR many shared borrows.
+    *   **Trap:** Trying to get both a mutable and immutable reference to the same simple variable concurrently.
+    *   In `main`, declare a mutable integer `let mut count = 0;`.
+    *   Get a mutable reference to `count`: `let count_mut_ref = &mut count;`.
+    *   While `count_mut_ref` is still in scope, try to get a shared reference to `count`: `let count_shared_ref = &count;`.
+    *   **Observe:** A compile error. Explain why this is unsafe (a mutable borrow implies nobody else can read or write, while a shared borrow implies multiple readers are allowed).
+    *   **Verification:** Run `cargo check`. The compiler error is the expected outcome.
+
+8.  **Simultaneous Borrows: Mutable vs. Immutable Conflicts (Example 2 - Using Methods)**
+    *   **Exercise Type Goal:** See the mutable/immutable conflict arise when using methods that require different types of borrows.
+    *   **Trap:** Calling a method requiring a shared borrow on a variable while holding a mutable borrow to it (or vice versa).
+    *   In `main`, create a mutable `String`.
+    *   Get a mutable reference to the string: `let s_mut = &mut my_string;`.
+    *   While `s_mut` is in scope, try to print the string using a shared reference via a method like `.as_str()` or directly with `println!(&my_string)`. Printing with `println!("{}", my_string)` might involve a shared borrow behind the scenes if `my_string` hasn't been moved. Using a method like `my_string.len()` also requires a shared borrow. Let's use `my_string.len()`.
+    *   **Observe:** A compile error. Explain why calling a method requiring `&self` (shared borrow) on `my_string` conflicts with the active `&mut s_mut` borrow.
+    *   **Verification:** Run `cargo check`. The compiler error is the expected outcome.
+
+9.  **Borrowing From Temporaries: Understanding Temporary Lifetimes (Example 1)**
+    *   **Exercise Type Goal:** Understand that references to temporary values are short-lived.
+    *   **Trap:** Trying to hold onto a reference derived from an intermediate calculation or method call after the expression finishes.
+    *   Define a function `get_string_value` that returns a `String`.
+    *   In `main`, call `get_string_value()` and try to take a reference to the *result* directly and assign it to a variable: `let temp_ref = &get_string_value();`.
+    *   Try to use `temp_ref` in the next line (e.g., `println!("{}", temp_ref);`).
+    *   **Observe:** A compile error related to the temporary value not living long enough.
+    *   **Discuss:** The `String` returned by `get_string_value()` is a temporary value. By default, temporaries live only for the duration of the statement where they are created. The reference `temp_ref` attempts to live longer, pointing to memory that is freed at the end of the `let temp_ref = ...;` statement.
+    *   **Correct:** If you need to keep the value, you must bind the *value* to a variable first, which extends its lifetime: `let owned_string = get_string_value(); let temp_ref = &owned_string;`.
+    *   **Verification:** Run `cargo check`. The compiler error is the expected outcome for the initial attempt. Implement the "Correct" version to see it compile.
+
+10. **Borrowing From Temporaries: Understanding Temporary Lifetimes (Example 2 - Method Calls)**
+    *   **Exercise Type Goal:** See the temporary lifetime trap in the context of method calls that return values.
+    *   **Trap:** Taking a reference to the value returned by a method and trying to use that reference later.
+    *   In `main`, create a `String`.
+    *   Try to get a reference to the result of a method call that returns a new value, like `.to_uppercase()`. Example: `let upper_ref = &my_string.to_uppercase();`.
+    *   Try to use `upper_ref` later.
+    *   **Observe:** A compile error.
+    *   **Discuss:** The `String` returned by `.to_uppercase()` is a new, temporary `String` value. Taking a reference to it and trying to use it after the statement ends is invalid because the temporary is dropped.
+    *   **Correct:** Bind the temporary result to a variable first to extend its lifetime: `let upper_string = my_string.to_uppercase(); let upper_ref = &upper_string;`.
+    *   **Verification:** Run `cargo check`. The compiler error is the expected outcome. Implement the "Correct" version to see it compile.
+
+11. **Borrows Across Control Flow (Loops and Conditionals - Example 1)**
+    *   **Exercise Type Goal:** Understand how a mutable borrow in one path prevents access in another.
+    *   **Trap:** Holding a mutable borrow of a variable and then trying to use that variable (even immutably) in a subsequent conditional branch.
+    *   In `main`, create a mutable `String`.
+    *   Get a mutable reference to the string: `let mut_ref = &mut my_string;`.
+    *   Modify the string using `mut_ref`.
+    *   After using `mut_ref` but while it's *still in scope*, use an `if` statement to check a condition. Inside the `if` block, try to get a shared reference to the *original* `my_string` variable: `let shared_ref = &my_string;`.
+    *   **Observe:** A compile error.
+    *   **Discuss:** While the mutable reference `mut_ref` is active, *no other* borrows (mutable or immutable) to `my_string` are allowed. The borrow checker enforces this across the control flow split.
+    *   **Correct:** The mutable borrow must end *before* you attempt to create the shared borrow. This can be achieved by letting the mutable reference variable go out of scope (e.g., end the block where `mut_ref` was declared) before the `if` statement.
+    *   **Verification:** Run `cargo check`. The compiler error is the expected outcome. Restructure the code with a scope block to see it compile.
+
+12. **Borrows Across Control Flow (Loops and Conditionals - Example 2)**
+    *   **Exercise Type Goal:** See how a borrow inside a loop iteration can interfere with subsequent iterations.
+    *   **Trap:** Creating a borrow within a loop that lives too long and prevents the next iteration from borrowing the same data again (especially mutably).
+    *   Create a mutable `Vec<i32>`.
+    *   Use a `while` loop that continues as long as the vector is not empty (`!my_vec.is_empty()`).
+    *   Inside the loop, try to get a mutable reference to the *first* element of the vector: `let first_elem_mut = &mut my_vec;`.
+    *   Modify the element via `first_elem_mut`.
+    *   Then, inside the *same* loop iteration, try to `pop()` an element from the vector.
+    *   **Observe:** A compile error.
+    *   **Discuss:** The mutable borrow `first_elem_mut` is created in one iteration. It remains active until the end of that iteration's scope. The `pop()` method requires a mutable borrow of the *entire* vector (`&mut self`). Rust cannot guarantee that `pop()` won't reallocate or invalidate the `first_elem_mut` reference, and the `pop()` call conflicts with the active mutable borrow `first_elem_mut`. Even if `pop` only modified the end, the borrow checker's analysis of `[]` and `pop` on `Vec` doesn't allow a mutable borrow of an element to coexist with a mutable borrow of the whole vector needed by `pop` in the same scope. This specific pattern is a common pitfall.
+    *   **Correct:** To achieve this, you need methods that allow you to manipulate the vector's structure or elements *while* holding borrows, like iterating with `iter_mut()`, which manages borrows correctly across iterations. A simple `while let Some(element) = my_vec.pop() { ... }` loop also works by taking ownership from the end. Or if you need mutable access to the first *and* want to pop, you'd typically combine operations differently or rethink the structure. The core fix is avoiding simultaneous conflicting borrows.
+    *   **Verification:** Run `cargo check`. The compiler error is the expected outcome. Discuss alternative safe patterns.
+
+13. **Borrowing From and Mutating Elements in the Same Collection Iteration (Example 1 - Indexing)**
+    *   **Exercise Type Goal:** Understand that modifying a collection while iterating or holding a borrow into it via index is often unsafe.
+    *   **Trap:** Using an index to get a mutable reference to an element and then trying to access or modify another element of the *same* vector using a different index within the same scope.
+    *   Create a mutable `Vec<i32>`.
+    *   Get a mutable reference to the first element: `let first_mut = &mut my_vec;`.
+    *   While holding `first_mut`, try to access (read) the second element using a shared reference via indexing: `let second_val = my_vec;`.
+    *   **Observe:** A compile error.
+    *   **Discuss:** A mutable borrow `&mut my_vec` means no other borrows (mutable or immutable) to *any part* of the vector `my_vec` are allowed during its active scope. Accessing `my_vec` attempts to create a shared borrow of part of the vector, which conflicts. This is a simplification by the borrow checker; in theory, modifying index 0 shouldn't affect index 1, but the borrow checker's rules are simpler and safer: a mutable borrow of *any part* of a collection typically exclusively locks the *entire* collection for other borrows.
+    *   **Verification:** Run `cargo check`. The compiler error is the expected outcome.
+
+14. **Borrowing From and Mutating Elements in the Same Collection Iteration (Example 2 - Iterators)**
+    *   **Exercise Type Goal:** Learn that standard iterators (`.iter()`, `.iter_mut()`) are designed to manage borrows correctly across iteration, but direct index-based modification alongside iteration can still be problematic.
+    *   **Trap:** Trying to use a `for` loop over `&my_vec` and *also* modify elements of `my_vec` using index access *inside* the loop.
+    *   Create a mutable `Vec<i32>`.
+    *   Iterate over the vector using a shared reference: `for number in &mut my_vec { ... }`. Use `&mut my_vec` to allow *modifying* the elements via the iterator item (`number`).
+    *   Inside the loop, while iterating, try to modify a *different* element of the vector using index access on the original `my_vec` variable: `my_vec = 99;`.
+    *   **Observe:** A compile error.
+    *   **Discuss:** The `&mut my_vec` iterator holds a mutable borrow on the vector across the entire loop. When you try to access `my_vec` inside the loop using `my_vec = 99;`, you are implicitly asking for *another* mutable borrow of `my_vec` (or a part of it). This conflicts with the borrow the iterator is already holding. The iterator is designed to give you one mutable reference (`&mut T`) at a time per iteration, not allow arbitrary mutable access to the entire collection concurrently.
+    *   **Correct:** Modify the element directly using the `number` variable provided by the `&mut my_vec` iterator (e.g., `*number += 1;`). If you need to modify a *different* element based on the current one, you often need to rethink the loop's structure, perhaps collecting indices first and then iterating again, or using a different data structure.
+    *   **Verification:** Run `cargo check`. The compiler error is the expected outcome. Modify the element directly using the iterator variable to see the corrected behavior.
+
+**Running the Application**
+
+As you complete each exercise, run `cargo run` (or `cargo check` if the step is expected to cause a compile error) to verify your understanding and code correctness before moving to the next one.
+
+**Key Concepts Review**
+
+*   **Dangling References:** Pointers to memory that has been freed. Rust prevents these at compile time.
+*   **Lifetime Parameters (`'a`, `'b`, etc.)**: Annotations used on functions and structs to tell the compiler how long borrowed data must live. They describe *relationships* between lifetimes, not specific durations.
+*   **Lifetime Elision:** Rules that allow omitting lifetime parameters in common, unambiguous cases.
+*   **Simultaneous Borrows:** The core rule: one mutable borrow OR many shared borrows *to the same data* at the same time.
+*   **Temporary Lifetimes:** Intermediate values created by expressions have limited scopes, often just the statement where they are created. References to temporaries are short-lived.
+*   **Borrows and Control Flow:** The borrow checker tracks borrows across `if/else` branches and loop iterations.
+*   **Collection Borrowing:** Modifying a collection's structure or accessing elements in a conflicting way while holding borrows into it is forbidden to prevent invalidated references. Iterators manage borrows safely across iterations.
+
+**Challenges / Next Steps**
+
+1.  **Self-Referential Structs:** Research why creating structs that contain references to their *own* data is generally impossible with basic Rust references and requires special approaches (like `Pin` and carefully structured `unsafe` code or crates like `ouroboros`).
+2.  **Higher-Rank Trait Bounds (HRTBs):** Explore more advanced lifetime concepts like `for<'a>`. When are these necessary?
+3.  **Static and Owned Data with Structs:** Refactor Exercise 6. Instead of storing `&str` in `ConfigRef`, store owned `String`s. How does this change the struct definition (no lifetime parameters needed)? What are the trade-offs?
+
+**Troubleshooting**
+
+*   **`borrow of moved value: ...`**: Indicates an ownership issue, not a borrow issue. Review ownership/move rules (Lab 1).
+*   **`cannot borrow ... as mutable ...` / `cannot borrow ... as immutable ...`**: Classic borrow checker errors. You have an active borrow that conflicts with the borrow you are trying to create. Trace the conflicting borrows and ensure they don't overlap in scope according to the one-mutable-OR-many-shared rule.
+*   **`borrowed value does not live long enough` / `lifetime may not live long enough`**: This is a lifetime error. The reference you are trying to use (or store in a struct) points to data that will go out of scope and be dropped *before* the reference (or the struct holding it) is finished being used. Ensure the data lives at least as long as the reference or struct that borrows it. Look at where the data is defined and where the reference/struct is used.
+
+**Conclusion**
+
+You've tackled challenging scenarios involving Rust's borrowing and lifetime rules. By encountering and resolving these compile errors, you've gained a deeper appreciation for how Rust prevents common memory safety bugs. While it requires careful thought upfront, mastering these concepts unlocks the ability to write safe, concurrent, and performant code.
+
+This custom Rust training was created by IQSOFT - EduTech/gabor for Ericsson – © 2025.
+All materials are exclusively for use by participants of the training. Sharing or using these materials outside of the training is not permitted without written permission from IQSOFT - EduTech.
+
+Before concluding your session, remember to commit your changes (`git commit -am "feat: complete borrowing and lifetimes lab"` - using conventional commits) and synchronize them with your remote repository (`git push`).
+
+**Final Solution Code (src/main.rs)**
+
+```rust
+// src/main.rs
+
+fn main() {
+    println!("--- Rust Borrowing and Lifetimes Lab Solutions ---");
+
+    // 1. Exercise: Function Returning a Reference: The "Dangling Reference" Problem (Attempt 1)
+    println!("\n--- Exercise 1: Dangling Reference (Attempt 1) ---");
+    // This code is expected to cause a compile error.
+    /*
+    fn create_and_return_string_ref() -> &str {
+        let s = String::from("function data");
+        // We try to return a slice of the local string 's'
+        &s[..] // s will be dropped when the function exits!
+    }
+    let dangling_ref = create_and_return_string_ref();
+    println!("This line will not be reached due to compile error: {}", dangling_ref);
+    */
+    println!("Code for Exercise 1 is commented out as it causes a compile error related to dangling references.");
+    println!("Trap: Returning a reference to data that lives only within the function.");
+
+
+    // 2. Exercise: Function Returning a Reference: The "Dangling Reference" Problem (Attempt 2)
+    println!("\n--- Exercise 2: Dangling Reference (Attempt 2) ---");
+     // This code is expected to cause a compile error.
+    /*
+    fn create_string_and_return_ref() -> (String, &str) {
+        let s = String::from("data and ref");
+        let r = &s[..];
+        // We try to return both the String (moves ownership) and a slice (&str) of the *original* memory location
+        (s, r) // The String value moves, but 'r' points to the memory 's' used to occupy, which is dropped.
+    }
+    let (owned_string, dangling_ref_in_tuple) = create_string_and_return_ref();
+    println!("Owned string: {}", owned_string);
+    println!("This line will not be reached due to compile error: {}", dangling_ref_in_tuple);
+    */
+    println!("Code for Exercise 2 is commented out as it causes a compile error related to dangling references in a tuple.");
+    println!("Trap: Returning an owned value and a reference to its original memory simultaneously.");
+
+
+    // 3. Exercise: Function Returning a Reference Dependent on Multiple Input Lifetimes (Example 1)
+    println!("\n--- Exercise 3: Function Returning Reference (Multi-Input) ---");
+    // Exercise type goal: Learn lifetime parameters on function signatures.
+    // Trap: Omitting lifetime annotations.
+    // Correct function signature with lifetime parameters:
+    fn first_or_second<'a>(s1: &'a str, s2: &'a str) -> &'a str {
+        if s1.starts_with('A') {
+            s1 // Return the first if it starts with 'A'
+        } else {
+            s2 // Otherwise return the second
+        }
+    }
+    let str_a = "Apple";
+    let str_b = "Banana";
+    let chosen_str = first_or_second(str_a, str_b);
+    println!("Chosen string: {}", chosen_str);
+
+    let str_c = "Cherry";
+    let str_d = "Date";
+    let chosen_str_2 = first_or_second(str_c, str_d); // 'c' does not start with 'A'
+    println!("Chosen string 2: {}", chosen_str_2);
+
+
+    // 4. Exercise: Function Returning a Reference Dependent on Multiple Input Lifetimes (Example 2)
+    println!("\n--- Exercise 4: Function Returning Reference (Specific Input) ---");
+     // Exercise type goal: Apply lifetime parameters when output depends on a specific input reference.
+     // Trap: Not understanding which input lifetime matters.
+     // Correct function signature with lifetime parameters:
+     fn combine_and_slice<'a>(s_string: &'a String, s_slice: &str) -> &'a str {
+        // Imagine combining, but we just slice the first input string
+        // The returned slice borrows from 's_string', so its lifetime is tied to 's_string'
+        &s_string[0..3] // Take a slice of the first 3 bytes (assuming ASCII)
+     }
+
+    let my_owned_string = String::from("HelloWorld");
+    let my_literal_slice = "ignore this slice";
+    let result_slice = combine_and_slice(&my_owned_string, my_literal_slice);
+    println!("Result slice from function: {}", result_slice);
+
+
+    // 5. Exercise: Structs Holding Multiple References with Different Lifetimes (Example 1)
+    println!("\n--- Exercise 5: Struct with References (Annotation) ---");
+    // Exercise type goal: Learn how to annotate structs with lifetime parameters.
+    // Trap: Defining structs with reference fields without lifetimes.
+    // Correct struct definition with lifetime parameters:
+    #[derive(Debug)] // Derive Debug to print easily
+    struct ConfigRef<'a, 'b> {
+        key: &'a str,
+        value: &'b str,
+    }
+
+    let literal_key = "database_url"; // &'static str
+    let literal_value = "localhost:5432"; // &'static str
+    // Since both literals have 'static lifetime, this is fine.
+    let config_instance = ConfigRef {
+        key: literal_key,
+        value: literal_value,
+    };
+    println!("Config instance: {:?}", config_instance);
+
+
+    // 6. Exercise: Structs Holding Multiple References with Different Lifetimes (Example 2 - The Outliving Trap)
+    println!("\n--- Exercise 6: Struct with References (Outliving Trap) ---");
+     // Exercise type goal: Understand that a struct instance cannot outlive *any* data it borrows from.
+     // Trap: Using a struct instance after shorter-lived data it borrows from is dropped.
+    let outer_string = String::from("OuterData"); // Lives until the end of main
+
+    { // Inner scope
+        let inner_string = String::from("InnerData"); // Lives only within this block
+        let inner_slice = &inner_string[..];
+
+        // Create a ConfigRef instance. Its lifetime needs to be limited by the shorter lifetime, which is inner_string's.
+        let config_instance_in_scope = ConfigRef {
+            key: &outer_string[..], // Borrows from outer_string ('static lifetime, longer)
+            value: inner_slice,    // Borrows from inner_string (lives only until end of this block)
+        };
+
+        println!("Config instance inside scope: {:?}", config_instance_in_scope);
+
+        // If you try to return config_instance_in_scope or use it after this block,
+        // the compiler will error because it borrows from inner_string which is dropped here.
+        // Example of compile error attempt:
+        // let config_after_scope = config_instance_in_scope; // Error: `inner_string` dropped here, value borrowed until here
+    } // inner_string goes out of scope here and is dropped.
+
+    println!("Code for Exercise 6 demonstrates the compile error by showing the scopes.");
+    println!("Trap: Trying to use a struct instance (or a variable holding it) after the data its references point to has been dropped.");
+
+
+    // 7. Exercise: Simultaneous Borrows: Mutable vs. Immutable Conflicts (Example 1 - Simple Variable)
+    println!("\n--- Exercise 7: Simultaneous Borrows (Simple Var) ---");
+    // Exercise type goal: Directly experience the one-mutable OR many-shared rule.
+    // Trap: Getting both &mut and & to the same variable concurrently.
+    let mut count = 0;
+
+    let count_mut_ref = &mut count; // Mutable borrow starts here
+
+    // This will NOT compile because count_mut_ref is active:
+    // let count_shared_ref = &count; // Error: cannot borrow `count` as immutable because it is also borrowed as mutable
+    // println!("Shared ref: {}", count_shared_ref); // This line won't be reached
+
+    // You can use the mutable reference:
+    *count_mut_ref += 1;
+    println!("Modified count via mutable ref: {}", count_mut_ref); // Using count_mut_ref is fine
+
+    // The mutable borrow 'count_mut_ref' ends here if its scope ended.
+    // If it's still in scope, the conflicting line above won't compile.
+    // For this example, assume count_mut_ref's scope is just the block above its use.
+    // If defined outside this block, the conflict is clear.
+
+    println!("Code for Exercise 7 demonstrates the compile error by showing the conflicting line.");
+    println!("Trap: Attempting to get a shared borrow while a mutable borrow is active.");
+
+
+    // 8. Exercise: Simultaneous Borrows: Mutable vs. Immutable Conflicts (Example 2 - Using Methods)
+    println!("\n--- Exercise 8: Simultaneous Borrows (Methods) ---");
+    // Exercise type goal: See mutable/immutable conflicts with method calls.
+    // Trap: Calling a method requiring &self while holding an &mut self borrow.
+    let mut my_string_for_borrow_methods = String::from("hello");
+
+    let s_mut = &mut my_string_for_borrow_methods; // Mutable borrow starts
+
+    // This will NOT compile because s_mut is active:
+    // let len = my_string_for_borrow_methods.len(); // Error: cannot borrow `my_string_for_borrow_methods` as immutable because it is also borrowed as mutable
+    // println!("String length: {}", len); // This line won't be reached
+
+    // You can use the mutable reference:
+    s_mut.push_str(" world");
+    println!("Modified string via mutable ref: {}", s_mut);
+
+    // The mutable borrow 's_mut' ends here if its scope ended.
+
+    println!("Code for Exercise 8 demonstrates the compile error when calling .len() while a mutable borrow is active.");
+    println!("Trap: Calling methods requiring a shared borrow (`&self`) on the original variable while a mutable borrow (`&mut`) is active.");
+
+
+    // 9. Exercise: Borrowing From Temporaries: Understanding Temporary Lifetimes (Example 1)
+    println!("\n--- Exercise 9: Borrowing From Temporaries (Function Return) ---");
+    // Exercise type goal: Understand short lifetimes of references to temporary function return values.
+    // Trap: Trying to use a reference to a temporary value after the statement ends.
+    fn get_string_value() -> String {
+        String::from("temporary data")
+    }
+
+    // This will NOT compile:
+    /*
+    let temp_ref = &get_string_value(); // get_string_value() returns a temporary String. We get a reference to it.
+    println!("This line will not be reached: {}", temp_ref); // The temporary String is dropped at the end of the 'let' statement!
+    */
+    println!("Code for Exercise 9 demonstrates the compile error when referencing a function's temporary return value.");
+    println!("Trap: A reference to a temporary value (like a function return that isn't bound) has a very short lifetime.");
+    // Correct way: Bind the value to extend its lifetime
+    let owned_string_from_fn = get_string_value(); // Bind the returned String to a variable
+    let valid_ref = &owned_string_from_fn; // Get a reference to the variable
+    println!("Valid reference after binding: {}", valid_ref);
+
+
+    // 10. Exercise: Borrowing From Temporaries: Understanding Temporary Lifetimes (Example 2 - Method Calls)
+    println!("\n--- Exercise 10: Borrowing From Temporaries (Method Return) ---");
+    // Exercise type goal: See temporary lifetime trap with method calls returning values.
+    // Trap: Taking a reference to the value returned by a method.
+    let my_string_for_temp = String::from("lowercase");
+
+    // This will NOT compile:
+    /*
+    let upper_ref = &my_string_for_temp.to_uppercase(); // .to_uppercase() returns a NEW temporary String. We get a reference to it.
+    println!("This line will not be reached: {}", upper_ref); // The temporary String is dropped at the end of the 'let' statement!
+    */
+    println!("Code for Exercise 10 demonstrates the compile error when referencing a method's temporary return value.");
+     println!("Trap: A reference to a temporary value returned by a method has a very short lifetime.");
+    // Correct way: Bind the temporary result
+    let upper_string = my_string_for_temp.to_uppercase(); // Bind the temporary String
+    let valid_upper_ref = &upper_string; // Get a reference to the variable
+    println!("Valid reference after binding: {}", valid_upper_ref);
+
+
+    // 11. Exercise: Borrows Across Control Flow (Loops and Conditionals - Example 1)
+    println!("\n--- Exercise 11: Borrows Across Control Flow (If) ---");
+    // Exercise type goal: See how a mutable borrow in one path prevents access later.
+    // Trap: Holding a mutable borrow across a control flow split where the original data is needed.
+    let mut string_for_control_flow = String::from("control");
+
+    { // Introduce a scope to control the mutable reference's lifetime
+        let mut_ref_cf = &mut string_for_control_flow; // Mutable borrow starts
+
+        mut_ref_cf.push_str("-flow"); // Use the mutable reference
+
+        println!("Used mutable ref inside scope.");
+
+        // If mut_ref_cf's scope extended past this point, the following 'if'
+        // trying to get a shared borrow would FAIL.
+
+    } // mut_ref_cf goes out of scope here, releasing the mutable borrow
+
+    // NOW, the mutable borrow is inactive, so we can get a shared borrow:
+    let condition = true;
+    if condition {
+        let shared_ref_cf = &string_for_control_flow; // Safe now because mut_ref_cf is out of scope
+        println!("Inside if, got shared ref: {}", shared_ref_cf);
+    } else {
+        let another_shared_ref_cf = &string_for_control_flow; // Also safe
+        println!("Inside else, got shared ref: {}", another_shared_ref_cf);
+    }
+
+    println!("Code for Exercise 11 demonstrates how scoping a mutable borrow resolves the conflict.");
+    println!("Trap: Holding a mutable borrow active longer than needed prevents other borrows.");
+
+
+    // 12. Exercise: Borrows Across Control Flow (Loops and Conditionals - Example 2)
+     println!("\n--- Exercise 12: Borrows Across Control Flow (Loop) ---");
+    // Exercise type goal: See how a borrow inside a loop interferes with subsequent iterations.
+    // Trap: Creating a borrow inside a loop that conflicts with operations needed in the next iteration (like pop()).
+    let mut vec_for_loop_borrow = vec![1, 2, 3];
+
+    // This common intuitive pattern will NOT compile:
+    /*
+    while !vec_for_loop_borrow.is_empty() {
+        let first_elem_mut = &mut vec_for_loop_borrow[0]; // Mutable borrow of element 0 starts
+        *first_elem_mut += 1; // Modify element 0
+
+        // This next line requires a mutable borrow of the *entire* vector,
+        // which conflicts with the active 'first_elem_mut' borrow.
+        vec_for_loop_borrow.pop(); // Error: cannot borrow `vec_for_loop_borrow` as mutable more than once at a time / conflicts with first_elem_mut
+        // The 'first_elem_mut' borrow would ideally end here, but the compiler sees the conflict.
+    }
+    */
+    println!("Code for Exercise 12 demonstrates the compile error when trying to mutate an element by index and pop in the same loop iteration.");
+    println!("Trap: Creating a mutable borrow into a collection that prevents collection-level mutations needed later in the same scope/loop iteration.");
+    println!("Correct way (using pop, changes order):");
+    let mut vec_for_loop_correct = vec![1, 2, 3];
+    while let Some(mut elem) = vec_for_loop_correct.pop() { // Loop takes ownership of elements from the end
+         elem += 1; // Modify the owned element
+         println!("Popped and modified: {}", elem);
+         // No borrow into the original vector is held here by the loop variable 'elem'
+    }
+     println!("Vector after pop loop: {:?}", vec_for_loop_correct);
+
+    println!("Correct way (using iter_mut, preserves order):");
+    let mut vec_for_iter_mut = vec![1, 2, 3];
+    // iter_mut() gives a mutable iterator, which manages borrows correctly across iterations
+    for element_ref in &mut vec_for_iter_mut {
+         *element_ref += 1; // Modify the element via the mutable reference from the iterator
+         // No conflicting borrows are attempted on the whole vector here
+    }
+     println!("Vector after iter_mut loop: {:?}", vec_for_iter_mut);
+
+
+    // 13. Exercise: Borrowing From and Mutating Elements in the Same Collection Iteration (Example 1 - Indexing)
+     println!("\n--- Exercise 13: Borrowing & Mutating Collection (Indexing) ---");
+    // Exercise type goal: Modifying a collection while holding a borrow into it via index is unsafe.
+    // Trap: Getting a mutable reference to one element and trying to access another element via index.
+    let mut vec_for_indexing_borrow = vec![10, 20, 30, 40];
+
+    let first_mut = &mut vec_for_indexing_borrow[0]; // Mutable borrow of element 0 starts
+
+    // This will NOT compile because 'first_mut' is active and locks the vector:
+    // let second_val = vec_for_indexing_borrow[1]; // Error: cannot borrow `vec_for_indexing_borrow` as immutable because it is also borrowed as mutable
+    // println!("Second element value: {}", second_val);
+
+    *first_mut += 5; // Can use the mutable borrow
+    println!("Modified first element: {}", first_mut);
+
+    // 'first_mut' borrow ends here if scope ends.
+
+    println!("Code for Exercise 13 demonstrates the compile error when getting a mutable borrow of one element and accessing another via index.");
+    println!("Trap: A mutable borrow of *any part* of a Vec typically prevents any other borrows of the Vec simultaneously.");
+
+
+    // 14. Exercise: Borrowing From and Mutating Elements in the Same Collection Iteration (Example 2 - Iterators)
+    println!("\n--- Exercise 14: Borrowing & Mutating Collection (Iterators) ---");
+    // Exercise type goal: See that modifying the collection structure/other elements *while* iterating mutably is restricted.
+    // Trap: Trying to use index access to modify another element within a &mut Vec iterator loop.
+    let mut vec_for_iterator_borrow = vec![1, 2, 3, 4];
+
+    // Iterate mutably
+    for number_ref in &mut vec_for_iterator_borrow { // Mutable borrow of vec_for_iterator_borrow starts, yields &mut i32
+        if *number_ref == 2 {
+             // This will NOT compile:
+            // vec_for_iterator_borrow[0] = 99; // Error: cannot borrow `vec_for_iterator_borrow` as mutable more than once at a time
+            // println!("Tried to modify vec[0] inside loop"); // Won't be reached
+        }
+        *number_ref += 10; // Safely modify the current element via the mutable reference from the iterator
+    } // Mutable borrow of vec_for_iterator_borrow ends
+
+    println!("Code for Exercise 14 demonstrates the compile error when trying to use index access to modify the collection while iterating mutably.");
+     println!("Trap: The mutable iterator holds a borrow that conflicts with other mutable access attempts on the same collection.");
+    println!("Vector after safe mutable iteration: {:?}", vec_for_iterator_borrow);
+
+
+    println!("\n--- Lab Complete ---");
+}
+
+// Function definition for Exercise 3 (placed outside main)
+fn first_or_second<'a>(s1: &'a str, s2: &'a str) -> &'a str {
+    if s1.starts_with('A') {
+        s1
+    } else {
+        s2
+    }
+}
+
+// Function definition for Exercise 4 (placed outside main)
+fn combine_and_slice<'a>(s_string: &'a String, _s_slice: &str) -> &'a str {
+    // _s_slice is marked with an underscore because it's not used in the function body,
+    // avoiding a compiler warning. Its lifetime still needs to be considered in the signature
+    // if the return type *could* potentially be derived from it, but in this specific case,
+    // the return is always from s_string, so only 'a is needed for the relationship.
+    &s_string[0..3] // Take a slice of the first 3 bytes (assuming ASCII)
+}
+
+
+// Struct definition for Exercise 5 (placed outside main)
+#[derive(Debug)]
+struct ConfigRef<'a, 'b> {
+    key: &'a str,
+    value: &'b str,
+}
+
+// Function definition for Exercise 9 (placed outside main)
+fn get_string_value() -> String {
+    String::from("temporary data")
+}
+```
+
+This custom Rust training was created by IQSOFT - EduTech/gabor for Ericsson – © 2025.
+All materials are exclusively for use by participants of the training. Sharing or using these materials outside of the training is not permitted without written permission from IQSOFT - EduTech.
+
+Before concluding your session, remember to commit your changes (`git commit -am "feat: complete borrowing and lifetimes lab"` - using conventional commits) and synchronize them with your remote repository (`git push`).
+
+**Check Questions (To Test Understanding)**
+
+1.  Explain the "dangling reference" problem and why Rust prevents it at compile time.
+2.  When is it necessary to explicitly declare lifetime parameters on a function signature?
+3.  If a struct has two fields, one of type `&'a str` and another of type `&'b str`, how long can an instance of this struct live?
+4.  Describe the rule regarding simultaneous mutable and immutable borrows in Rust.
+5.  What is the typical lifetime of a reference obtained from a temporary value (like the result of a method call or function return that isn't immediately bound to a variable)?
+
+**Detailed Answers to Check Questions**
+
+1.  The "dangling reference" problem occurs when a reference points to a memory location that has already been deallocated or is no longer valid. This can lead to use-after-free bugs, crashes, or security vulnerabilities. Rust prevents this by tracking lifetimes at compile time and ensuring that no reference can outlive the data it points to. If the compiler determines a reference *might* outlive its data, it produces a compile error.
+2.  It is necessary to explicitly declare lifetime parameters on a function signature when the lifetime of a reference returned by the function is related to (depends on) the lifetime of one or more references passed *into* the function, and Rust's automatic lifetime elision rules cannot unambiguously determine this relationship. This is most common when the function takes multiple references and returns a reference derived from one of them, or when returning references from structs that have reference fields with parameters.
+3.  If a struct instance has fields of type `&'a str` and `&'b str`, the struct instance itself (`MyStruct<'a, 'b>`) can live only as long as the **shorter** of the two lifetimes `'a` and `'b`. Rust guarantees that the data pointed to by *all* of its references remains valid for the entire duration the struct instance exists.
+4.  The rule regarding simultaneous mutable and immutable borrows is that for any given piece of data within a specific scope, you can have **either**:
+    *   Exactly **one** mutable reference (`&mut T`), OR
+    *   Any number of **shared** (immutable) references (`&T`).
+    You cannot have a mutable borrow active at the same time as any other borrow (mutable or shared) to the same data.
+5.  The typical lifetime of a reference obtained from a temporary value is very short. By default, temporary values in Rust are dropped at the **end of the statement** in which they are created. Therefore, a reference taken to such a temporary value is only guaranteed to be valid *within that single statement*. Trying to use the reference in subsequent statements will result in a compile-time error because the data it points to has already been dropped. To extend the lifetime of the data and the reference, you must bind the temporary value to a variable (e.g., `let my_var = some_expression();`) which extends the value's lifetime to the scope of `my_var`.
