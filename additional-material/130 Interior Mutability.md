@@ -116,3 +116,7 @@ We are taught Rust's strict borrowing rules: if you have an immutable reference 
     ```
 3.  **Note: It still provides a Safe API:** The `unsafe` code is contained *within* the standard library's `Cell` implementation. The user of `Cell` never needs to use `unsafe` themselves to call `.get()` or `.set()`. The standard library developers have carefully reasoned and proven that, *given the constraints on `Cell<T>`* (specifically, `Cell<T>` is `!Sync`, meaning you cannot share `&Cell<T>` across threads safely without synchronization), the way `set` and `get` use `unsafe` does not lead to memory unsafety or data races in a single-threaded context.
 
+---
+
+*This custom Rust training was created by **IQSOFT - EduTech/gabor for Ericsson – © 2025**. 
+All materials are exclusively for use by participants of the training. Using these materials outside of the training is not permitted without written permission from IQSOFT - EduTech.*
