@@ -1,4 +1,5 @@
 # Traits and Generics
+
 **1. The Concepts**
 
 *   **Traits:**
