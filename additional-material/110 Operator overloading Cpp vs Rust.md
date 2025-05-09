@@ -1,4 +1,5 @@
-# Lab 110: Operator overloading C++ vs Rust
+# Operator overloading C++ vs Rust
+
 1.  **Mechanism:**
     *   **C++:** Operator overloading is typically achieved by defining **special member functions** within a class or as **free functions** (non-member functions). The operator symbol followed by `operator` becomes the function name (e.g., `operator+`, `operator[]`).
         ```c++
